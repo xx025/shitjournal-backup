@@ -19,35 +19,18 @@
 
 ## 浏览归档（GitHub Pages）
 
-仓库内已包含静态站点（`docs/index.html` + `docs/assets/style.css`），用于在 GitHub Pages 上展示归档目录。**首次使用需在仓库设置中开启 Pages**：
+仓库内已包含用于 GitHub Pages 的静态站点，可在网页上浏览归档目录。**首次使用需在仓库设置中开启 Pages**：
 
 1. 打开 **Settings → Pages**
 2. **Source** 选择 **Deploy from a branch**
 3. **Branch** 选 `main`，**Folder** 选 **/docs**
 4. 保存后等待部署，站点地址为：**https://xx025.github.io/shitjournal-backup/**
 
-页面会从 `backup/index.json` 读取索引并列出新闻与预印本，点击条目可跳转到仓库内对应 Markdown 文件。
+页面会读取归档索引并列出新闻与预印本，点击条目可跳转到仓库内对应正文。
 
 ## 归档结构
 
-条目按 **id 分目录** 存放：
-
-- **新闻**：`backup/news/{slug 首字母}/{slug}.md`，如 `news/m/maintenance.md`
-- **预印本**：`backup/preprints/{UUID 前 2 位}/{uuid}.md`，如 `preprints/1f/1fd278a6-7895-4c19-9d4e-5fdbb76904a7.md`
-- **索引**：`backup/index.json` 记录当次同步的 URL、slug、标题与时间戳。
-
-```
-backup/
-├── index.json
-├── news/
-│   ├── g/
-│   ├── m/
-│   └── z/
-└── preprints/
-    ├── 1f/
-    ├── a9/
-    └── ...
-```
+归档按新闻与预印本分目录存放，每条目含 Markdown 正文与元数据，并维护索引便于检索。
 
 ## 同步与触发
 
@@ -55,22 +38,7 @@ backup/
 - **推送触发**：向 `main` 分支 push 时也会触发同步。
 - **手动**：在 GitHub Actions 中选择 “ShitJournal Archive Sync” → “Run workflow” 可立即执行。
 
-同步完成后，若有新增或变更，将自动提交并推送到本仓库。
-
-## 本地同步
-
-需在本地更新归档时：
-
-```bash
-pip install -r requirements.txt
-playwright install chromium
-
-# 仅同步新闻
-python crawler.py crawl --news-only
-
-# 同步新闻与预印本（可加 --preprints-limit N 限制预印本数量）
-python crawler.py crawl
-```
+同步完成后，若有新增或变更，将自动提交并推送到本仓库。若需在本地更新归档，可参考仓库内需求与规格文档。
 
 ## 许可与免责
 

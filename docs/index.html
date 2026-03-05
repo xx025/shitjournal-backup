@@ -111,12 +111,18 @@
       }
     }
 
+    function base64ToUtf8(base64) {
+      var binary = atob(base64.replace(/\n/g, ''));
+      var bytes = new Uint8Array(binary.length);
+      for (var i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+      return new TextDecoder('utf-8').decode(bytes);
+    }
     fetch('https://api.github.com/repos/' + REPO + '/contents/backup/index.json?ref=' + BRANCH)
       .then(function (r) { return r.json(); })
       .then(function (data) {
         if (data.message) throw new Error(data.message);
-        const raw = atob(data.content.replace(/\n/g, ''));
-        const index = JSON.parse(raw);
+        var raw = base64ToUtf8(data.content);
+        var index = JSON.parse(raw);
         renderNews(index.news || []);
         renderPreprints(index.preprints || []);
       })
