@@ -34,8 +34,17 @@
   </div>
 
   <script>
-    const REPO = 'xx025/shitjournal-backup';
-    const BRANCH = 'main';
+    // 从当前 Pages 地址自动推断仓库： https://{owner}.github.io/{repo}/
+    (function () {
+      var host = window.location.hostname || '';
+      var path = (window.location.pathname || '/').replace(/^\/+|\/+$/g, '');
+      var owner = host.split('.')[0];
+      var repoName = path ? path.split('/')[0] : '';
+      if (!repoName || repoName === 'index.html') repoName = 'shitjournal-backup';
+      window.__REPO__ = owner + '/' + repoName;
+    })();
+    var REPO = window.__REPO__ || 'xx025/shitjournal-backup';
+    var BRANCH = 'main';
 
     function slugify(s) {
       if (!s) return 'untitled';
