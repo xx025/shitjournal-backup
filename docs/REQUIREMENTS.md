@@ -102,7 +102,7 @@ flowchart LR
 - **运行环境**：GitHub Actions（`ubuntu-latest`）、Python 3.11、Playwright（Chromium）。
 - **来源站为 SPA**：需在无头浏览器中渲染后解析列表与详情；列表需支持多 zone（`?zone=latrine|septic|stone|sediment`）及分页（`&page=N`）。
 - **输出格式**：正文以 Markdown 存储；元数据以 JSON 存储；文件名与路径须满足「按 id 分目录」规则。
-- **礼貌策略**：请求间隔、固定 User-Agent 等，以减轻对来源站压力；具体实现见仓库内同步脚本。
+- **礼貌策略**：请求间隔、固定 User-Agent 等，以减轻对来源站压力；具体实现见 `.github/scripts/sync.py`。
 
 ---
 

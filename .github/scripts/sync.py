@@ -250,9 +250,62 @@ def save_article(data: dict, subdir: str, organize_by_id: bool = True) -> Path |
     return md_path, subpath, safe_slug
 
 
+def _capture_pdf_pages(page, subpath: Path, safe_slug: str) -> list[str]:
+    """正文为 react-pdf 在 canvas 上渲染时，逐页截图保存。返回已写入的文件名列表。"""
+    written: list[str] = []
+    try:
+        page.wait_for_selector(".react-pdf__Page canvas, .react-pdf__Document", timeout=15000)
+        time.sleep(1.0)  # 等首帧渲染
+    except Exception:
+        return written
+    max_pages = 50
+    for page_num in range(1, max_pages + 1):
+        try:
+            canvas = page.locator(".react-pdf__Page canvas").first
+            if canvas.count() > 0:
+                out_name = f"{safe_slug}-{page_num}.png"
+                canvas.screenshot(path=str(subpath / out_name), timeout=20000)
+            else:
+                doc = page.locator(".react-pdf__Document").first
+                if doc.count() > 0:
+                    out_name = f"{safe_slug}-{page_num}.png"
+                    doc.screenshot(path=str(subpath / out_name), timeout=20000)
+                else:
+                    break
+            written.append(out_name)
+        except Exception:
+            break
+        # 下一页（按钮文案为「下一页 →」）
+        try:
+            next_btn = page.locator('button:has-text("下一页")').first
+            if next_btn.count() == 0:
+                next_btn = page.locator('button:has-text("Next")').first
+            if next_btn.count() == 0 or not next_btn.is_visible():
+                break
+            if next_btn.get_attribute("disabled") is not None:
+                break
+            next_btn.click()
+            time.sleep(1.5)
+            page.wait_for_load_state("networkidle", timeout=20000)
+        except Exception:
+            break
+    return written
+
+
 def _download_body_images(page, subpath: Path, safe_slug: str) -> None:
-    """正文在站点上以图片形式加载时，从页面中下载这些图片并保存到同目录，并写入 .md 引用。"""
+    """正文在站点上以图片或 PDF(canvas) 形式加载时，先尝试 PDF 逐页截图，否则从 img/background-image 下载。"""
     md_path = subpath / f"{safe_slug}.md"
+    written = _capture_pdf_pages(page, subpath, safe_slug)
+    if written and md_path.exists():
+        md_path.write_text(
+            md_path.read_text(encoding="utf-8").rstrip()
+            + "\n\n"
+            + "\n".join(f"![正文第{i+1}页]({f})" for i, f in enumerate(written))
+            + "\n",
+            encoding="utf-8",
+        )
+        return
+
     try:
         # 从 main 内收集 img 的 src（排除明显为图标的小图）
         img_data = page.evaluate(

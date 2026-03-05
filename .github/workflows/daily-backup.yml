@@ -36,7 +36,7 @@ jobs:
         run: playwright install chromium
 
       - name: Sync and archive
-        run: python crawler.py crawl --preprints-limit 100 --push-every 25
+        run: python .github/scripts/sync.py run --preprints-limit 100 --push-every 25
 
       - name: Commit and push archive
         run: |

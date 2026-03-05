@@ -19,6 +19,7 @@
       <ul class="list" id="news-list">
         <li class="loading">加载中…</li>
       </ul>
+      <nav class="pagination" id="news-pagination" aria-label="新闻分页"></nav>
     </section>
 
     <section class="section" id="preprints-section">
@@ -26,6 +27,7 @@
       <ul class="list" id="preprints-list">
         <li class="loading">加载中…</li>
       </ul>
+      <nav class="pagination" id="preprints-pagination" aria-label="预印本分页"></nav>
     </section>
 
     <footer>
@@ -45,6 +47,7 @@
     })();
     var REPO = window.__REPO__ || 'xx025/shitjournal-backup';
     var BRANCH = 'main';
+    var PAGE_SIZE = 15;
 
     function slugify(s) {
       if (!s) return 'untitled';
@@ -71,14 +74,53 @@
       return `https://github.com/${REPO}/blob/${BRANCH}/${path}`;
     }
 
-    function renderNews(items) {
+    function slicePage(items, page) {
+      var start = (page - 1) * PAGE_SIZE;
+      return items.slice(start, start + PAGE_SIZE);
+    }
+
+    function totalPages(total) {
+      return Math.max(1, Math.ceil(total / PAGE_SIZE));
+    }
+
+    function renderPagination(containerId, currentPage, total, onPageChange) {
+      const nav = document.getElementById(containerId);
+      nav.innerHTML = '';
+      if (total <= PAGE_SIZE) return;
+      const pages = totalPages(total);
+      const frag = document.createDocumentFragment();
+      const prev = document.createElement('button');
+      prev.type = 'button';
+      prev.className = 'pagination-btn';
+      prev.textContent = '上一页';
+      prev.disabled = currentPage <= 1;
+      prev.addEventListener('click', function () { if (currentPage > 1) onPageChange(currentPage - 1); });
+      frag.appendChild(prev);
+      const span = document.createElement('span');
+      span.className = 'pagination-info';
+      span.textContent = '第 ' + currentPage + ' / ' + pages + ' 页，共 ' + total + ' 条';
+      frag.appendChild(span);
+      const next = document.createElement('button');
+      next.type = 'button';
+      next.className = 'pagination-btn';
+      next.textContent = '下一页';
+      next.disabled = currentPage >= pages;
+      next.addEventListener('click', function () { if (currentPage < pages) onPageChange(currentPage + 1); });
+      frag.appendChild(next);
+      nav.appendChild(frag);
+    }
+
+    function renderNews(items, page) {
+      page = page || 1;
       const ul = document.getElementById('news-list');
       ul.innerHTML = '';
       if (!items.length) {
         ul.innerHTML = '<li class="loading">暂无收录</li>';
+        renderPagination('news-pagination', 1, 0, function () {});
         return;
       }
-      items.forEach(function (item) {
+      const pageItems = slicePage(items, page);
+      pageItems.forEach(function (item) {
         const path = newsPath(item.slug);
         const li = document.createElement('li');
         li.innerHTML = '<a href="' + blobUrl(path) + '" target="_blank" rel="noopener">' +
@@ -87,16 +129,22 @@
           '</a>';
         ul.appendChild(li);
       });
+      renderPagination('news-pagination', page, items.length, function (p) {
+        renderNews(window.__newsItems__ || [], p);
+      });
     }
 
-    function renderPreprints(items) {
+    function renderPreprints(items, page) {
+      page = page || 1;
       const ul = document.getElementById('preprints-list');
       ul.innerHTML = '';
       if (!items.length) {
         ul.innerHTML = '<li class="loading">暂无收录</li>';
+        renderPagination('preprints-pagination', 1, 0, function () {});
         return;
       }
-      items.forEach(function (item) {
+      const pageItems = slicePage(items, page);
+      pageItems.forEach(function (item) {
         const path = preprintPath(item.slug);
         const li = document.createElement('li');
         li.innerHTML = '<a href="' + blobUrl(path) + '" target="_blank" rel="noopener">' +
@@ -104,6 +152,9 @@
           (item.url ? '<span class="meta">' + escapeHtml(item.url) + '</span>' : '') +
           '</a>';
         ul.appendChild(li);
+      });
+      renderPagination('preprints-pagination', page, items.length, function (p) {
+        renderPreprints(window.__preprintItems__ || [], p);
       });
     }
 
@@ -138,8 +189,10 @@
         if (data.message) throw new Error(data.message);
         var raw = base64ToUtf8(data.content);
         var index = JSON.parse(raw);
-        renderNews(index.news || []);
-        renderPreprints(index.preprints || []);
+        window.__newsItems__ = index.news || [];
+        window.__preprintItems__ = index.preprints || [];
+        renderNews(window.__newsItems__, 1);
+        renderPreprints(window.__preprintItems__, 1);
       })
       .catch(function (err) {
         renderNews([]);
