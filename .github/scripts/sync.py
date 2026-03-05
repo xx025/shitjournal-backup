@@ -274,40 +274,54 @@ def _migrate_flat_news_to_grouped(out_dir: Path) -> None:
 def _capture_pdf_pages(page, subpath: Path, safe_slug: str) -> list[str]:
     """正文为 react-pdf 在 canvas 上渲染时，逐页截图保存。返回已写入的文件名列表。"""
     written: list[str] = []
-    try:
-        page.wait_for_selector(".react-pdf__Page canvas, .react-pdf__Document", timeout=15000)
-        time.sleep(1.0)  # 等首帧渲染
-    except Exception:
-        return written
+    # 多选择器、更长等待，便于 PDF 首帧渲染
+    for selector in [".react-pdf__Page canvas", ".react-pdf__Document", "main canvas"]:
+        try:
+            page.wait_for_selector(selector, timeout=25000)
+            time.sleep(2.0)  # 等首帧画完
+            break
+        except Exception:
+            continue
+    else:
+        return written  # 所有选择器都未出现
+
     max_pages = 50
     for page_num in range(1, max_pages + 1):
         try:
             canvas = page.locator(".react-pdf__Page canvas").first
             if canvas.count() > 0:
                 out_name = f"{safe_slug}-{page_num}.png"
-                canvas.screenshot(path=str(subpath / out_name), timeout=20000)
+                canvas.screenshot(path=str(subpath / out_name), timeout=25000)
             else:
                 doc = page.locator(".react-pdf__Document").first
                 if doc.count() > 0:
                     out_name = f"{safe_slug}-{page_num}.png"
-                    doc.screenshot(path=str(subpath / out_name), timeout=20000)
+                    doc.screenshot(path=str(subpath / out_name), timeout=25000)
                 else:
-                    break
+                    # 兜底：main 内任意大 canvas（单页全文用一块 canvas 时）
+                    main_canvas = page.locator("main canvas").first
+                    if main_canvas.count() > 0:
+                        out_name = f"{safe_slug}-{page_num}.png"
+                        main_canvas.screenshot(path=str(subpath / out_name), timeout=25000)
+                    else:
+                        break
             written.append(out_name)
         except Exception:
             break
-        # 下一页（按钮文案为「下一页 →」）
+        # 下一页（支持「下一页」「下一页 →」「Next」等）
         try:
-            next_btn = page.locator('button:has-text("下一页")').first
-            if next_btn.count() == 0:
-                next_btn = page.locator('button:has-text("Next")').first
+            next_btn = (
+                page.get_by_role("button", name=re.compile(r"下一页|Next", re.I)).first
+                or page.locator('button:has-text("下一页")').first
+                or page.locator('button:has-text("Next")').first
+            )
             if next_btn.count() == 0 or not next_btn.is_visible():
                 break
             if next_btn.get_attribute("disabled") is not None:
                 break
             next_btn.click()
-            time.sleep(1.5)
-            page.wait_for_load_state("networkidle", timeout=20000)
+            time.sleep(2.0)
+            page.wait_for_load_state("networkidle", timeout=25000)
         except Exception:
             break
     return written
@@ -423,6 +437,17 @@ def _download_body_images(page, subpath: Path, safe_slug: str) -> None:
         except Exception:
             pass
 
+    # 仍无图时：对 main 内单块 canvas 整块截图（部分文章整页用一块 canvas）
+    if not written:
+        try:
+            canvas = page.locator("main canvas").first
+            if canvas.count() > 0:
+                out_name = f"{safe_slug}-1.png"
+                canvas.screenshot(path=str(subpath / out_name), timeout=15000)
+                written.append(out_name)
+        except Exception:
+            pass
+
     if written and md_path.exists():
         md_path.write_text(
             md_path.read_text(encoding="utf-8")
@@ -431,6 +456,35 @@ def _download_body_images(page, subpath: Path, safe_slug: str) -> None:
             + "\n",
             encoding="utf-8",
         )
+
+
+def _article_md_path(out_dir: Path, slug: str, kind: str) -> tuple[Path, Path, str] | None:
+    """根据 slug 与类型返回 (md_path, subpath, safe_slug)，路径无效则 None。"""
+    if not slug:
+        return None
+    if kind == "news":
+        first = slug[0].lower() if slug[0].isalnum() else "x"
+        safe_slug = slugify(slug)
+        subpath = out_dir / "news" / first
+        return (subpath / f"{safe_slug}.md", subpath, safe_slug)
+    if kind == "preprints":
+        prefix = slug[:2].lower() if len(slug) >= 2 else "xx"
+        safe_slug = slug
+        subpath = out_dir / "preprints" / prefix
+        return (subpath / f"{safe_slug}.md", subpath, safe_slug)
+    return None
+
+
+def _md_has_body_content(md_path: Path, safe_slug: str) -> bool:
+    """判断 .md 是否已包含正文图片（避免重复回填）。"""
+    if not md_path.exists():
+        return False
+    text = md_path.read_text(encoding="utf-8")
+    if "![正文" in text:
+        return True
+    if f"]({safe_slug}-" in text or f"]({safe_slug}." in text:
+        return True
+    return False
 
 
 def _load_existing_index(out_dir: Path) -> tuple[set[str], set[str], dict]:
@@ -605,6 +659,73 @@ def run_sync(
 
 
 app = typer.Typer(help="S.H.I.T Journal 归档同步")
+
+@app.command("backfill-body")
+def backfill_body_cmd(
+    output_dir: Path = typer.Option(OUTPUT_DIR, "--output", "-o", help="归档输出目录"),
+    news_only: bool = typer.Option(False, "--news-only", help="仅补新闻"),
+    preprints_only: bool = typer.Option(False, "--preprints-only", help="仅补预印本"),
+    limit: int = typer.Option(0, "--limit", help="最多处理条数，0 表示不限制"),
+    force: bool = typer.Option(False, "--force", help="即使已有正文也重新抓取"),
+    delay: float = typer.Option(DELAY_SECONDS, "--delay", help="请求间隔秒数"),
+    headless: bool = typer.Option(True, "--headless/--no-headless", help="是否无头模式"),
+) -> None:
+    """根据 index.json 对已有 .md 补全正文（canvas/图片）。仅处理缺正文的条目。"""
+    out_dir = Path(output_dir)
+    index_path = out_dir / "index.json"
+    if not index_path.exists():
+        typer.echo("未找到 index.json，请先执行 run 同步。", err=True)
+        raise SystemExit(1)
+
+    index = json.loads(index_path.read_text(encoding="utf-8"))
+    todo: list[tuple[str, Path, str]] = []
+    for item in index.get("news", []) + index.get("preprints", []):
+        kind = "news" if item.get("url", "").count("/news/") else "preprints"
+        if news_only and kind != "news":
+            continue
+        if preprints_only and kind != "preprints":
+            continue
+        slug = item.get("slug")
+        url = item.get("url")
+        if not slug or not url:
+            continue
+        res = _article_md_path(out_dir, slug, kind)
+        if not res:
+            continue
+        md_path, subpath, safe_slug = res
+        if not md_path.exists():
+            continue
+        if not force and _md_has_body_content(md_path, safe_slug):
+            continue
+        todo.append((url, subpath, safe_slug))
+        if limit > 0 and len(todo) >= limit:
+            break
+
+    if not todo:
+        typer.echo("没有需要补正文的条目。")
+        return
+
+    typer.echo(f"待补正文：共 {len(todo)} 条。")
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=headless)
+        context = browser.new_context(
+            user_agent="ShitJournalBackup/1.0 (+https://github.com; backup bot)",
+            viewport={"width": 1280, "height": 720},
+        )
+        page = context.new_page()
+        page.set_default_timeout(30000)
+        for url, subpath, safe_slug in tqdm(todo, desc="补正文"):
+            time.sleep(delay)
+            try:
+                page.goto(url, wait_until="networkidle")
+                time.sleep(1.0)
+                _download_body_images(page, subpath, safe_slug)
+            except Exception as e:
+                typer.echo(f"  skip {url}: {e}", err=True)
+        context.close()
+        browser.close()
+    typer.echo("完成。")
+
 
 @app.command("run")
 def run_cmd(

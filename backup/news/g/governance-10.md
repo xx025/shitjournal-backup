@@ -50,3 +50,6 @@
 投稿时请勾选「S.H.I.T社区治理1.0」专题约稿选项
 
 [Submit Your Proposal / 提交方案](/submit)
+
+
+![正文](governance-10.png)
