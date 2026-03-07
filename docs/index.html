@@ -14,6 +14,11 @@
       <p>对 S.H.I.T Journal 的新闻与预印本进行长期归档，便于引用与离线访问。</p>
     </header>
 
+    <section class="section" id="recent-updates-section" style="display: none;">
+      <h2 class="section-title">最近更新</h2>
+      <ul class="list" id="recent-updates-list"></ul>
+    </section>
+
     <section class="section" id="news-section">
       <h2 class="section-title">新闻</h2>
       <ul class="list" id="news-list">
@@ -37,8 +42,13 @@
 
   <script>
     // 从当前 Pages 地址自动推断仓库： https://{owner}.github.io/{repo}/
+    // 本地或非 github.io 访问时使用默认仓库，否则 GitHub API 会 404
     (function () {
-      var host = window.location.hostname || '';
+      var host = (window.location.hostname || '').toLowerCase();
+      if (host === 'localhost' || host === '127.0.0.1' || host === '' || host.indexOf('github.io') === -1) {
+        window.__REPO__ = 'xx025/shitjournal-backup';
+        return;
+      }
       var path = (window.location.pathname || '/').replace(/^\/+|\/+$/g, '');
       var owner = host.split('.')[0];
       var repoName = path ? path.split('/')[0] : '';
@@ -183,16 +193,51 @@
         return decodeURIComponent(escape(binary));
       }
     }
+    var RECENT_NEWS_COUNT = 1;
+    var RECENT_PREPRINTS_COUNT = 5;
+
+    function renderRecentUpdatesFromIndex(newsItems, preprintItems) {
+      var recentNews = (newsItems || []).slice(0, RECENT_NEWS_COUNT);
+      var recentPreprints = (preprintItems || []).slice(0, RECENT_PREPRINTS_COUNT);
+      if (recentNews.length === 0 && recentPreprints.length === 0) return;
+      var section = document.getElementById('recent-updates-section');
+      var ul = document.getElementById('recent-updates-list');
+      if (!section || !ul) return;
+      ul.innerHTML = '';
+      recentNews.forEach(function (item) {
+        var path = newsPath(item.slug);
+        var li = document.createElement('li');
+        li.innerHTML = '<a href="' + blobUrl(path) + '" target="_blank" rel="noopener">' +
+          '<span class="title">' + escapeHtml(item.title || item.slug) + '</span>' +
+          '<span class="meta">新闻</span>' +
+          '</a>';
+        ul.appendChild(li);
+      });
+      recentPreprints.forEach(function (item) {
+        var path = preprintPath(item.slug);
+        var li = document.createElement('li');
+        li.innerHTML = '<a href="' + blobUrl(path) + '" target="_blank" rel="noopener">' +
+          '<span class="title">' + escapeHtml(item.title || item.slug) + '</span>' +
+          '<span class="meta">预印本</span>' +
+          '</a>';
+        ul.appendChild(li);
+      });
+      section.style.display = 'block';
+    }
+
     fetch('https://api.github.com/repos/' + REPO + '/contents/backup/index.json?ref=' + BRANCH)
       .then(function (r) { return r.json(); })
       .then(function (data) {
         if (data.message) throw new Error(data.message);
         var raw = base64ToUtf8(data.content);
         var index = JSON.parse(raw);
-        window.__newsItems__ = index.news || [];
-        window.__preprintItems__ = index.preprints || [];
+        var newsRaw = index.news || [];
+        var preprintsRaw = index.preprints || [];
+        window.__newsItems__ = newsRaw.slice().reverse();
+        window.__preprintItems__ = preprintsRaw.slice().reverse();
         renderNews(window.__newsItems__, 1);
         renderPreprints(window.__preprintItems__, 1);
+        renderRecentUpdatesFromIndex(window.__newsItems__, window.__preprintItems__);
       })
       .catch(function (err) {
         renderNews([]);
