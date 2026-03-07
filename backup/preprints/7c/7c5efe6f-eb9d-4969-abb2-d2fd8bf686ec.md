@@ -4,8 +4,7 @@
 - **author**: 粪发涂墙扎克王
 - **institution**: 同G大学同志括约肌挫伤风险研究实验室
 - **discipline**: 理 / Science
-- **submitted**: 2026/3/4 01:58:51
-- **viscosity**: High-Entropy / 高熵态
+- **submitted**: 3/3/2026, 5:58:51 PM
 
 ---
 
@@ -15,17 +14,15 @@
 
 同G大学同志括约肌挫伤风险研究实验室
 
-High-Entropy / 高熵态
+纯享整活
 
 理 / Science
 
-2026/3/4 01:58:51
+3/3/2026, 5:58:51 PM
 
-Huya10188
+Huya:10188
 
-### Rate / 评价
-
-[Sign In / 登录](/login)
+[登录](/login)
 
 ### Manuscript / 全文
 
@@ -33,6 +30,19 @@ Huya10188
 
 暂无评论 / No comments yet
 
+## USER NOTICE / 用户须知
+
+Please read carefully before proceeding / 使用本网站前请仔细阅读
+
+欢迎访问 S.H.I.T. Journal。
+
+本平台为非营利性学术与文化讨论社区。为保障平台的正常运行、防范恶意攻击及履行必要的合规义务，本网站需使用 Cookie 及同类技术来维持登录状态及安全防护机制。
+
+鉴于本平台内容的特殊性，您在进入本网站前，必须明确知悉并同意：1. 本网站内容仅代表作者个人观点，不代表平台立场。2. 您应当遵守适用法律法规，平台有权根据规则对违规内容采取清理、折叠或移交等措施。3. 您在使用本平台服务时产生的一切数据交互，均受本站法律条款约束。
+
+如您拒绝接受本声明，请立即关闭浏览器标签页并停止访问本站。
+
+[《用户协议》](/terms)
+[《隐私政策》](/privacy)
+
 ![正文第1页](7c5efe6f-eb9d-4969-abb2-d2fd8bf686ec-1.png)
-![正文第2页](7c5efe6f-eb9d-4969-abb2-d2fd8bf686ec-2.png)
-![正文第3页](7c5efe6f-eb9d-4969-abb2-d2fd8bf686ec-3.png)
