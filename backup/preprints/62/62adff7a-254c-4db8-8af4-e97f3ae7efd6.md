@@ -1,26 +1,26 @@
-# 她的朋友圈下面有 20 个舔狗点赞——你怎么赢？多追求者竞争女 神关注的博弈论完全指南
+# 性压抑与道德推脱对理科实验室双配偶地下恋情的影响
 
-- **URL**: https://shitjournal.org/preprints/7276d656-e24e-41af-9c78-c1f854d23ced
-- **author**: Dr. 阿波
-- **institution**: Northwestern University
-- **discipline**: 理 / Science
-- **submitted**: 2/25/2026, 7:31:23 PM
+- **URL**: https://shitjournal.org/preprints/62adff7a-254c-4db8-8af4-e97f3ae7efd6
+- **author**: 韩侂史
+- **institution**: 良子大学
+- **discipline**: 交叉 / Interdisciplinary
+- **submitted**: 3/4/2026, 8:51:38 AM
 
 ---
 
-## 她的朋友圈下面有 20 个舔狗点赞——你怎么赢？多追求者竞争女 神关注的博弈论完全指南
+## 性压抑与道德推脱对理科实验室双配偶地下恋情的影响
 
-Dr. 阿波
+韩侂史
 
-Northwestern University
+良子大学
 
 纯享整活
 
-理 / Science
+交叉 / Interdisciplinary
 
-2/25/2026, 7:31:23 PM
+3/4/2026, 8:51:38 AM
 
-正能量！抖音 @阿波 （账号：A2057296384）小红书 @Jacob (账号：Jacob_Lian)
+48858993
 
 [登录](/login)
 
@@ -45,4 +45,4 @@ Please read carefully before proceeding / 使用本网站前请仔细阅读
 [《用户协议》](/terms)
 [《隐私政策》](/privacy)
 
-![正文第1页](7276d656-e24e-41af-9c78-c1f854d23ced-1.png)
+![正文第1页](62adff7a-254c-4db8-8af4-e97f3ae7efd6-1.png)
