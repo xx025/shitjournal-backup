@@ -5,6 +5,7 @@
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>S.H.I.T Journal 归档</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
@@ -78,6 +79,12 @@
       if (!slug || slug.length < 2) return `backup/preprints/xx/${slug}.md`;
       const prefix = slug.slice(0, 2).toLowerCase();
       return `backup/preprints/${prefix}/${slug}.md`;
+    }
+
+    function preprintMetaPath(slug) {
+      if (!slug || slug.length < 2) return `backup/preprints/xx/${slug}.meta.json`;
+      const prefix = slug.slice(0, 2).toLowerCase();
+      return `backup/preprints/${prefix}/${slug}.meta.json`;
     }
 
     function blobUrl(path) {
@@ -155,15 +162,16 @@
       }
       const pageItems = slicePage(items, page);
       pageItems.forEach(function (item) {
-        const path = preprintPath(item.slug);
+        const previewUrl = 'preview.html?slug=' + encodeURIComponent(item.slug);
+        const originUrl = item.url || ('https://shitjournal.org/preprints/' + item.slug);
+        const metaPath = preprintMetaPath(item.slug);
         const li = document.createElement('li');
-        var metaParts = [];
-        if (item.url) metaParts.push('<span class="meta">' + escapeHtml(item.url) + '</span>');
-        if (item.pdf_url) metaParts.push('<a href="' + escapeHtml(item.pdf_url) + '" target="_blank" rel="noopener" class="meta">PDF</a>');
-        li.innerHTML = '<a href="' + blobUrl(path) + '" target="_blank" rel="noopener">' +
-          '<span class="title">' + escapeHtml(item.title || item.slug) + '</span>' +
-          (metaParts.length ? metaParts.join(' ') : '') +
-          '</a>';
+        var linkParts = [];
+        linkParts.push('<a href="' + escapeHtml(originUrl) + '" target="_blank" rel="noopener" class="list-link">[原文链接]</a>');
+        if (item.pdf_url) linkParts.push('<a href="' + escapeHtml(item.pdf_url) + '" target="_blank" rel="noopener" class="list-link">[PDF下载]</a>');
+        linkParts.push('<a href="' + blobUrl(metaPath) + '" target="_blank" rel="noopener" class="list-link">[元信息]</a>');
+        li.innerHTML = '<a href="' + previewUrl + '" class="list-title">' + escapeHtml(item.title || item.slug) + '</a>' +
+          '<span class="list-links">' + linkParts.join(' ') + '</span>';
         ul.appendChild(li);
       });
       renderPagination('preprints-pagination', page, items.length, function (p) {

@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>预览 — S.H.I.T Journal 归档</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <style>
+    .preview-article { margin-top: 1rem; }
+    .preview-article h1 { font-size: 1.1rem; margin-bottom: 0.5rem; }
+    .preview-article h2 { font-size: 0.9rem; margin: 1rem 0 0.4rem; color: var(--dim); }
+    .preview-article ul { margin: 0.25rem 0; padding-left: 1.25rem; }
+    .preview-article p { margin: 0.35rem 0; }
+    .preview-article img { max-width: 100%; height: auto; display: block; margin: 0.5rem 0; border: 1px solid var(--border); }
+    .preview-back { display: inline-block; margin-bottom: 1rem; font-size: 0.85rem; }
+    .preview-links { margin-bottom: 1rem; font-size: 0.85rem; }
+    .preview-links a { margin-right: 0.75rem; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <a href="index.html" class="preview-back">← 返回目录</a>
+    <div id="preview-loading">加载中…</div>
+    <div id="preview-error" class="error" style="display: none;"></div>
+    <article id="preview-article" class="preview-article" style="display: none;"></article>
+  </div>
+  <script>
+    (function () {
+      var host = (window.location.hostname || '').toLowerCase();
+      if (host === 'localhost' || host === '127.0.0.1' || host === '' || host.indexOf('github.io') === -1) {
+        window.__REPO__ = 'xx025/shitjournal-backup';
+      } else {
+        var path = (window.location.pathname || '/').replace(/^\/+|\/+$/g, '');
+        var owner = host.split('.')[0];
+        var repoName = path ? path.split('/')[0] : '';
+        if (!repoName || repoName === 'index.html' || repoName === 'preview.html') repoName = 'shitjournal-backup';
+        window.__REPO__ = owner + '/' + repoName;
+      }
+    })();
+    var REPO = window.__REPO__ || 'xx025/shitjournal-backup';
+    var BRANCH = 'main';
+    var RAW_CDN = 'https://xget.xi-xu.me/gh';
+    var RAW_GITHUB = 'https://raw.githubusercontent.com';
+    var parts = REPO.split('/');
+    var OWNER = parts[0] || 'xx025';
+    var REPO_NAME = parts[1] || 'shitjournal-backup';
+
+    function getCdnUrl(branch, filePath) {
+      return RAW_CDN + '/' + OWNER + '/' + REPO_NAME + '/raw/refs/heads/' + branch + '/' + filePath;
+    }
+    function getGitHubRawUrl(branch, filePath) {
+      return RAW_GITHUB + '/' + OWNER + '/' + REPO_NAME + '/' + branch + '/' + filePath;
+    }
+    function getRawUrl(branch, filePath) {
+      return getCdnUrl(branch, filePath);
+    }
+
+    function fetchWithTimeout(url, ms) {
+      var controller = new AbortController();
+      var tid = setTimeout(function () { controller.abort(); }, ms);
+      return fetch(url, { signal: controller.signal })
+        .then(function (r) {
+          clearTimeout(tid);
+          return r;
+        })
+        .catch(function (e) {
+          clearTimeout(tid);
+          throw e;
+        });
+    }
+
+    function fetchRaw(branch, filePath) {
+      var githubUrl = getGitHubRawUrl(branch, filePath);
+      var timeout = 10000;
+      return fetchWithTimeout(getCdnUrl(branch, filePath), timeout)
+        .then(function (r) {
+          if (r.ok) return r.text();
+          return fetchWithTimeout(githubUrl, timeout).then(function (r2) {
+            if (!r2.ok) throw new Error('raw 返回 ' + r2.status);
+            return r2.text();
+          });
+        })
+        .catch(function () {
+          return fetchWithTimeout(githubUrl, timeout).then(function (r) {
+            if (!r.ok) throw new Error('raw 返回 ' + r.status);
+            return r.text();
+          });
+        });
+    }
+
+    function getSlug() {
+      var params = new URLSearchParams(window.location.search);
+      return params.get('slug') || params.get('id') || '';
+    }
+
+    function preprintMdPath(slug) {
+      if (!slug || slug.length < 2) return 'backup/preprints/xx/' + slug + '.md';
+      var prefix = slug.slice(0, 2).toLowerCase();
+      return 'backup/preprints/' + prefix + '/' + slug + '.md';
+    }
+
+    function rawBase(slug) {
+      if (!slug || slug.length < 2) return getRawUrl(BRANCH, 'backup/preprints/xx');
+      var prefix = slug.slice(0, 2).toLowerCase();
+      return getRawUrl(BRANCH, 'backup/preprints/' + prefix);
+    }
+
+    function base64ToUtf8(base64) {
+      var b64 = (base64 || '').replace(/\s/g, '');
+      var binary = atob(b64);
+      var bytes = new Uint8Array(binary.length);
+      for (var i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+      try {
+        return new TextDecoder('utf-8').decode(bytes);
+      } catch (e) {
+        return decodeURIComponent(escape(binary));
+      }
+    }
+
+    function fetchMdViaApi(path) {
+      var url = 'https://api.github.com/repos/' + REPO + '/contents/' + encodeURIComponent(path) + '?ref=' + BRANCH;
+      return fetchWithTimeout(url, 12000)
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+          if (data.message) throw new Error(data.message);
+          if (data.content == null) throw new Error('无内容');
+          return base64ToUtf8(data.content);
+        });
+    }
+
+    function extractPdfUrl(md) {
+      var m = md.match(/\[PDF\]\((https?[^)]+)\)/i) || md.match(/\[.*?PDF.*?\]\((https?[^)]+)\)/i);
+      return m ? m[1] : '';
+    }
+
+    function stripLinksSection(md) {
+      return md.replace(/\n## 链接\n[\s\S]*?(?=\n##\s*\S|$)/i, '\n');
+    }
+
+    function rewriteRelativeUrls(md, slug) {
+      var base = rawBase(slug);
+      return md.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, function (_, alt, src) {
+        if (/^https?:\/\//i.test(src)) return '![' + alt + '](' + src + ')';
+        return '![' + alt + '](' + base + '/' + src.replace(/^\//, '') + ')';
+      }).replace(/\]\(([^)]+)\)/g, function (match, href) {
+        if (/^https?:\/\//i.test(href) || href.startsWith('#')) return match;
+        return '](' + base + '/' + href.replace(/^\//, '') + ')';
+      });
+    }
+
+    function insertLinksBar(articleEl, slug, pdfUrl) {
+      var prefix = slug.length >= 2 ? slug.slice(0, 2).toLowerCase() : 'xx';
+      var originUrl = 'https://shitjournal.org/preprints/' + slug;
+      var metaUrl = getRawUrl(BRANCH, 'backup/preprints/' + prefix + '/' + slug + '.meta.json');
+      var h1 = articleEl.querySelector('h1');
+      if (!h1) return;
+      var div = document.createElement('div');
+      div.className = 'preview-links';
+      div.innerHTML = '<a href="' + originUrl + '" target="_blank" rel="noopener">[原文链接]</a>' +
+        (pdfUrl ? '<a href="' + pdfUrl + '" target="_blank" rel="noopener">[PDF下载]</a>' : '') +
+        ' <a href="' + metaUrl + '" target="_blank" rel="noopener">[元信息]</a>';
+      h1.parentNode.insertBefore(div, h1.nextSibling);
+    }
+
+    function showError(msg) {
+      loadingEl.style.display = 'none';
+      errorEl.style.display = 'block';
+      errorEl.textContent = msg;
+    }
+
+    function renderMd(raw) {
+      var pdfUrl = extractPdfUrl(raw);
+      var md = rewriteRelativeUrls(raw, slug);
+      md = stripLinksSection(md);
+      if (typeof marked !== 'undefined') {
+        marked.setOptions({ gfm: true, breaks: true });
+        articleEl.innerHTML = marked.parse(md);
+      } else {
+        articleEl.textContent = md;
+      }
+      insertLinksBar(articleEl, slug, pdfUrl);
+      articleEl.style.display = 'block';
+      document.title = (articleEl.querySelector('h1') && articleEl.querySelector('h1').textContent) || slug + ' — 预览';
+    }
+
+    var slug = getSlug();
+    var loadingEl = document.getElementById('preview-loading');
+    var errorEl = document.getElementById('preview-error');
+    var articleEl = document.getElementById('preview-article');
+
+    if (!slug) {
+      showError('缺少参数：请使用 ?slug=预印本id 或 ?id=预印本id');
+    } else {
+      var path = preprintMdPath(slug);
+      fetchMdViaApi(path)
+        .then(function (raw) {
+          loadingEl.style.display = 'none';
+          renderMd(raw);
+        })
+        .catch(function (err) {
+          if (err.name === 'AbortError') {
+            showError('加载超时，请刷新重试。');
+            return;
+          }
+          var msg = err.message || '网络错误';
+          if (msg.indexOf('403') !== -1 || msg.indexOf('rate limit') !== -1) {
+            showError('GitHub API 限流（403），请稍后再试。正在尝试从 CDN 拉取…');
+            fetchRaw(BRANCH, path).then(function (raw2) {
+              loadingEl.style.display = 'none';
+              errorEl.style.display = 'none';
+              renderMd(raw2);
+            }).catch(function () {
+              showError('加载失败：GitHub API 限流且 CDN 不可用，请稍后再试。');
+            });
+            return;
+          }
+          showError('加载失败：' + msg + '。正在尝试从 CDN 拉取…');
+          fetchRaw(BRANCH, path).then(function (raw2) {
+            loadingEl.style.display = 'none';
+            errorEl.style.display = 'none';
+            renderMd(raw2);
+          }).catch(function () {
+            showError('加载失败：' + msg);
+          });
+        });
+    }
+  </script>
+</body>
+</html>
