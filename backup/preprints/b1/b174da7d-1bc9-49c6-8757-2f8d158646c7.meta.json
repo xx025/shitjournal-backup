@@ -1,0 +1,28 @@
+{
+  "article": {
+    "id": "b174da7d-1bc9-49c6-8757-2f8d158646c7",
+    "title": "基于学术平权与内容质量自治的S.H.I.T治理方案探讨",
+    "file_name": "b174da7d-1bc9-49c6-8757-2f8d158646c7",
+    "pdf_url": "https://files.shitjournal.org/b174da7d-1bc9-49c6-8757-2f8d158646c7.pdf",
+    "tag": "meme",
+    "zones": "septic",
+    "status": "passed",
+    "discipline": "law_social",
+    "topic": "S.H.I.T社区治理1.0",
+    "co_authors": [],
+    "suggestions": "",
+    "rating_count": 41,
+    "avg_score": 4.390243902439025,
+    "my_score": null,
+    "created_at": "2026-03-03T18:19:41.696025Z",
+    "author": {
+      "id": "5a20b166-150a-458b-9fe4-32f75a64bc68",
+      "display_name": "Wagner Zeno",
+      "avatar_url": null,
+      "institution": "Threshold Cognitive University",
+      "social_media": "@SilentTwilight"
+    }
+  },
+  "comments": [],
+  "fetched_at": "2026-03-08T09:54:22Z"
+}

@@ -1,0 +1,28 @@
+{
+  "article": {
+    "id": "f176a1a8-9b99-41af-ade1-e831ca620dd9",
+    "title": "I.\t最劣路径问题：网络路由中最大低效性算法研究",
+    "file_name": "f176a1a8-9b99-41af-ade1-e831ca620dd9",
+    "pdf_url": "https://files.shitjournal.org/f176a1a8-9b99-41af-ade1-e831ca620dd9.pdf",
+    "tag": "meme",
+    "zones": "septic",
+    "status": "passed",
+    "discipline": "engineering",
+    "topic": "nan",
+    "co_authors": [],
+    "suggestions": "",
+    "rating_count": 48,
+    "avg_score": 3.9583333333333335,
+    "my_score": null,
+    "created_at": "2026-03-04T13:01:21.968065Z",
+    "author": {
+      "id": "3f2397ad-67d6-4b3d-982b-c674e6561a27",
+      "display_name": "Owen Claussen",
+      "avatar_url": null,
+      "institution": "University of Phasianus Colchicus",
+      "social_media": null
+    }
+  },
+  "comments": [],
+  "fetched_at": "2026-03-08T09:49:43Z"
+}
