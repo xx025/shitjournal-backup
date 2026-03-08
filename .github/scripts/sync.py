@@ -463,6 +463,32 @@ def collect_ids_with_pdf(out_dir: Path) -> list[str]:
     return sorted(set(ids))
 
 
+def collect_ids_missing_pdf(out_dir: Path) -> list[str]:
+    """扫描 .meta.json：有 pdf_url 但本地无 PDF 的预印本 id 列表（用于重试）。"""
+    preprints_dir = out_dir / "preprints"
+    if not preprints_dir.is_dir():
+        return []
+    missing: list[str] = []
+    for prefix_dir in preprints_dir.iterdir():
+        if not prefix_dir.is_dir():
+            continue
+        for meta_file in prefix_dir.glob("*.meta.json"):
+            aid = meta_file.name.removesuffix(".meta.json")
+            if len(aid) < 2:
+                continue
+            pdf_path = out_dir / "pdfs" / aid[:2].lower() / f"{aid}.pdf"
+            if pdf_path.is_file():
+                continue
+            try:
+                full = json.loads(meta_file.read_text(encoding="utf-8"))
+                article = full.get("article") if isinstance(full, dict) else None
+                if article and isinstance(article, dict) and article.get("pdf_url"):
+                    missing.append(aid)
+            except (json.JSONDecodeError, OSError):
+                pass
+    return sorted(set(missing))
+
+
 def remove_legacy_images(subpath: Path, aid: str) -> int:
     """删除该预印本目录下旧版正文截图（{id}-*.png 等），返回删除数量。"""
     removed = 0
@@ -634,6 +660,48 @@ def run_update_md_from_local(
     typer.echo("本地更新完成。已根据 .meta.json 与 PDF 重写 .md 并生成正文图。")
 
 
+def run_retry_pdf(
+    output_dir: Path | None = None,
+    limit: int = 0,
+    delay: float = REFRESH_DELAY_SECONDS,
+) -> None:
+    """对有 pdf_url 但本地无 PDF 的预印本单独重试下载 PDF 并生成正文图。不访问文章 API。"""
+    global OUTPUT_DIR
+    OUTPUT_DIR = Path(output_dir or OUTPUT_DIR)
+    if not OUTPUT_DIR.is_dir():
+        typer.echo(f"目录不存在: {OUTPUT_DIR}", err=True)
+        raise SystemExit(1)
+    ids = collect_ids_missing_pdf(OUTPUT_DIR)
+    to_process = ids if limit <= 0 else ids[:limit]
+    typer.echo(f"缺失 PDF 的预印本共 {len(ids)} 篇，本次重试 {len(to_process)} 篇。")
+    for aid in tqdm(to_process, desc="重试 PDF"):
+        time.sleep(delay)
+        meta_path = OUTPUT_DIR / "preprints" / aid[:2].lower() / f"{aid}.meta.json"
+        if not meta_path.is_file():
+            continue
+        try:
+            full = json.loads(meta_path.read_text(encoding="utf-8"))
+            article = full.get("article") if isinstance(full, dict) else None
+        except (json.JSONDecodeError, OSError):
+            continue
+        if not article or not isinstance(article, dict):
+            continue
+        pdf_url = article.get("pdf_url")
+        if not pdf_url:
+            continue
+        if not download_pdf(pdf_url, aid, OUTPUT_DIR):
+            continue
+        prefix = aid[:2].lower()
+        pdf_path = OUTPUT_DIR / "pdfs" / prefix / f"{aid}.pdf"
+        subpath = OUTPUT_DIR / "preprints" / prefix
+        if subpath.is_dir():
+            remove_legacy_images(subpath, aid)
+        images = pdf_to_images(pdf_path, aid, subpath)
+        if images:
+            append_body_images_to_md(subpath / f"{aid}.md", images)
+    typer.echo("重试完成。")
+
+
 app = typer.Typer(help="S.H.I.T Journal 归档同步（API）")
 
 
@@ -693,6 +761,16 @@ def update_md_local_cmd(
         limit=limit,
         delete_images_before=not no_delete_images,
     )
+
+
+@app.command("retry-pdf")
+def retry_pdf_cmd(
+    output_dir: Path = typer.Option(OUTPUT_DIR, "--output", "-o", help="归档输出目录"),
+    limit: int = typer.Option(0, "--limit", help="最多重试篇数，0 表示全部"),
+    delay: float = typer.Option(REFRESH_DELAY_SECONDS, "--delay", help="每次请求间隔秒数，默认 5"),
+) -> None:
+    """对有 pdf_url 但本地无 PDF 的预印本重试下载并生成正文图，不访问文章 API。"""
+    run_retry_pdf(output_dir=output_dir, limit=limit, delay=delay)
 
 
 @app.command("rebuild-index")
