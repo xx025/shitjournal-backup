@@ -132,11 +132,11 @@ def save_preprint_article(
         "",
         "## 链接",
         "",
-        f"- [在线阅读]({web_url})",
+        f"- [网站原始文章]({web_url})",
     ])
     if pdf_url:
-        md_lines.append(f"- [PDF 下载（无水印）]({pdf_url})")
-        md_lines.append(f"- 本仓库归档: `backup/pdfs/{prefix}/{aid}.pdf`")
+        md_lines.append(f"- [PDF]({pdf_url})")
+    md_lines.append(f"- [文章元信息]({aid}.meta.json)")
     md_lines.append("")
 
     md_path = subpath / f"{aid}.md"
@@ -161,6 +161,46 @@ def download_pdf(pdf_url: str, article_id: str, out_dir: Path) -> bool:
     except (HTTPError, URLError, OSError) as e:
         typer.echo(f"PDF 下载失败 {article_id}: {e}", err=True)
         return False
+
+
+def pdf_to_images(pdf_path: Path, article_id: str, preprints_subpath: Path, max_pages: int = 50) -> list[str]:
+    """用 pdftoppm 将 PDF 转为 PNG，写入 preprints 目录，返回图片文件名列表。"""
+    if not pdf_path.exists() or not article_id:
+        return []
+    try:
+        subprocess.run(
+            ["pdftoppm", "-png", "-r", "150", str(pdf_path.resolve()), article_id],
+            cwd=preprints_subpath,
+            check=True,
+            capture_output=True,
+            timeout=120,
+        )
+    except (subprocess.CalledProcessError, FileNotFoundError, subprocess.TimeoutExpired) as e:
+        typer.echo(f"PDF 转图片失败 {article_id}: {e}", err=True)
+        return []
+    out = sorted(preprints_subpath.glob(f"{article_id}-*.png"), key=lambda p: p.name)
+    if len(out) > max_pages:
+        for f in out[max_pages:]:
+            try:
+                f.unlink()
+            except OSError:
+                pass
+        out = out[:max_pages]
+    return [f.name for f in out]
+
+
+def append_body_images_to_md(md_path: Path, image_filenames: list[str]) -> None:
+    """在 .md 末尾追加 ## 正文 与图片引用；若已有 ## 正文 则不再追加（幂等）。"""
+    if not image_filenames or not md_path.exists():
+        return
+    content = md_path.read_text(encoding="utf-8")
+    if "## 正文" in content:
+        return
+    lines = ["", "## 正文", ""]
+    for i, name in enumerate(image_filenames, 1):
+        lines.append(f"![第{i}页]({name})")
+        lines.append("")
+    md_path.write_text(content + "\n".join(lines), encoding="utf-8")
 
 
 def load_existing_index(out_dir: Path) -> tuple[set[str], dict]:
@@ -252,7 +292,13 @@ def run_sync(
         pdf_url = article.get("pdf_url")
         if pdf_url:
             time.sleep(DELAY_SECONDS)
-            download_pdf(pdf_url, aid, OUTPUT_DIR)
+            if download_pdf(pdf_url, aid, OUTPUT_DIR):
+                prefix = aid[:2].lower()
+                pdf_path = OUTPUT_DIR / "pdfs" / prefix / f"{aid}.pdf"
+                subpath = OUTPUT_DIR / "preprints" / prefix
+                images = pdf_to_images(pdf_path, aid, subpath)
+                if images:
+                    append_body_images_to_md(subpath / f"{aid}.md", images)
         new_preprints.append({
             "url": f"https://shitjournal.org/preprints/{aid}",
             "slug": aid,
@@ -396,7 +442,13 @@ def run_migrate_legacy(
         pdf_url = article.get("pdf_url")
         if pdf_url:
             time.sleep(delay)
-            download_pdf(pdf_url, aid, OUTPUT_DIR)
+            if download_pdf(pdf_url, aid, OUTPUT_DIR):
+                prefix = aid[:2].lower()
+                pdf_path = OUTPUT_DIR / "pdfs" / prefix / f"{aid}.pdf"
+                subpath = OUTPUT_DIR / "preprints" / prefix
+                images = pdf_to_images(pdf_path, aid, subpath)
+                if images:
+                    append_body_images_to_md(subpath / f"{aid}.md", images)
         if delete_images:
             prefix = aid[:2].lower()
             subpath = OUTPUT_DIR / "preprints" / prefix
@@ -446,7 +498,13 @@ def run_refresh_md(
         pdf_url = article.get("pdf_url")
         if pdf_url:
             time.sleep(delay)
-            download_pdf(pdf_url, aid, OUTPUT_DIR)
+            if download_pdf(pdf_url, aid, OUTPUT_DIR):
+                prefix = aid[:2].lower()
+                pdf_path = OUTPUT_DIR / "pdfs" / prefix / f"{aid}.pdf"
+                subpath = OUTPUT_DIR / "preprints" / prefix
+                images = pdf_to_images(pdf_path, aid, subpath)
+                if images:
+                    append_body_images_to_md(subpath / f"{aid}.md", images)
         if delete_images:
             prefix = aid[:2].lower()
             subpath = OUTPUT_DIR / "preprints" / prefix

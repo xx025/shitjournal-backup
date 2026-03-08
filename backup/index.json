@@ -1316,7 +1316,49 @@
       "url": "https://shitjournal.org/preprints/387bbebf-b06f-4020-bee7-dbb146088f7c",
       "slug": "387bbebf-b06f-4020-bee7-dbb146088f7c",
       "title": "人类（Homo sapiens）等脊椎动物固体粪便物理参数的跨物种差异及关联因素研究"
+    },
+    {
+      "url": "https://shitjournal.org/preprints/84836806-9f25-435d-9df0-0a50d6bedd6f",
+      "slug": "84836806-9f25-435d-9df0-0a50d6bedd6f",
+      "title": "隔夜蒜薹与地三鲜口感“夯”性探究",
+      "pdf_url": "https://files.shitjournal.org/84836806-9f25-435d-9df0-0a50d6bedd6f.pdf",
+      "created_at": "2026-03-03T09:30:49.646647Z",
+      "author": {
+        "id": "4dc90ae3-ab5e-4054-a09b-6e008c4e629a",
+        "display_name": "巨能拉",
+        "avatar_url": null,
+        "institution": "二食堂二楼",
+        "social_media": "bcptdtptpdjl"
+      }
+    },
+    {
+      "url": "https://shitjournal.org/preprints/3b5ab426-e7fb-4296-b920-123503543c59",
+      "slug": "3b5ab426-e7fb-4296-b920-123503543c59",
+      "title": "论摄像机无存储介质状态下摄影师的导演式蒙混机制：一种表演性记录理论的建构与阈值分析",
+      "pdf_url": "https://files.shitjournal.org/3b5ab426-e7fb-4296-b920-123503543c59.pdf",
+      "created_at": "2026-03-03T10:24:08.316275Z",
+      "author": {
+        "id": "92f35413-6c54-4965-a000-c7d96e7da5b0",
+        "display_name": "胡小弟",
+        "avatar_url": null,
+        "institution": "影像星球",
+        "social_media": "B站/影像星球IMAGEPLANET"
+      }
+    },
+    {
+      "url": "https://shitjournal.org/preprints/8bebe3e1-2a5d-44f7-9276-23f67693a3be",
+      "slug": "8bebe3e1-2a5d-44f7-9276-23f67693a3be",
+      "title": "S.H.I.T.治理公约1.0：基于博弈论与鲁棒统计的学术去中心化自治框架",
+      "pdf_url": "https://files.shitjournal.org/8bebe3e1-2a5d-44f7-9276-23f67693a3be.pdf",
+      "created_at": "2026-02-27T00:22:16.240540Z",
+      "author": {
+        "id": "a9622d6b-b09e-4d74-8775-a7db934b78bc",
+        "display_name": "Dr. 阿波",
+        "avatar_url": null,
+        "institution": "Northwestern University",
+        "social_media": "Dr. 阿波"
+      }
     }
   ],
-  "crawled_at": "2026-03-07T17:29:09Z"
+  "synced_at": "2026-03-08T09:24:05Z"
 }
