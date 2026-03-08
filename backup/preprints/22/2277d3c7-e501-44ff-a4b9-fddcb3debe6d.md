@@ -1,10 +1,29 @@
 # 万物皆屎：从自熏回路到炼屎法术——屎神自由度的生成机制
 
+## 元信息
+
 - **作者**: 心中无石
 - **机构**: 构石大学诗人卧持研究院
-- **提交时间**: 2026-03-04T18:15:25.255599Z
 - **分区**: septic
+- **学科**: interdisciplinary
+- **标签**: meme
+- **提交时间**: 2026-03-04T18:15:25.255599Z
+- **评分**: 4.40 / 5（35 人）
 
-- [在线阅读](https://shitjournal.org/preprints/2277d3c7-e501-44ff-a4b9-fddcb3debe6d)
-- [PDF 下载（无水印）](https://files.shitjournal.org/2277d3c7-e501-44ff-a4b9-fddcb3debe6d.pdf)
-- 本仓库归档: `backup/pdfs/22/2277d3c7-e501-44ff-a4b9-fddcb3debe6d.pdf`
+## 链接
+
+- [网站原始文章](https://shitjournal.org/preprints/2277d3c7-e501-44ff-a4b9-fddcb3debe6d)
+- [PDF](https://files.shitjournal.org/2277d3c7-e501-44ff-a4b9-fddcb3debe6d.pdf)
+- [文章元信息](2277d3c7-e501-44ff-a4b9-fddcb3debe6d.meta.json)
+
+## 正文
+
+![第1页](2277d3c7-e501-44ff-a4b9-fddcb3debe6d-1.png)
+
+![第2页](2277d3c7-e501-44ff-a4b9-fddcb3debe6d-2.png)
+
+![第3页](2277d3c7-e501-44ff-a4b9-fddcb3debe6d-3.png)
+
+![第4页](2277d3c7-e501-44ff-a4b9-fddcb3debe6d-4.png)
+
+![第5页](2277d3c7-e501-44ff-a4b9-fddcb3debe6d-5.png)

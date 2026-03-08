@@ -401,6 +401,22 @@ def collect_all_preprint_ids_from_index(out_dir: Path) -> list[str]:
         return []
 
 
+def collect_ids_with_pdf(out_dir: Path) -> list[str]:
+    """扫描 backup/pdfs，返回本地已有 PDF 的预印本 id 列表。"""
+    pdfs_dir = out_dir / "pdfs"
+    if not pdfs_dir.is_dir():
+        return []
+    ids: list[str] = []
+    for prefix_dir in pdfs_dir.iterdir():
+        if not prefix_dir.is_dir():
+            continue
+        for pdf_file in prefix_dir.glob("*.pdf"):
+            aid = pdf_file.stem
+            if len(aid) >= 2:
+                ids.append(aid)
+    return sorted(set(ids))
+
+
 def remove_legacy_images(subpath: Path, aid: str) -> int:
     """删除该预印本目录下旧版正文截图（{id}-*.png 等），返回删除数量。"""
     removed = 0
@@ -525,6 +541,53 @@ def run_refresh_md(
     typer.echo("刷新完成。已更新 .meta.json 与 .md（含丰富元信息），并处理 PDF、正文图。")
 
 
+def run_update_md_from_local(
+    output_dir: Path | None = None,
+    limit: int = 0,
+    delete_images_before: bool = True,
+) -> None:
+    """仅用本地 .meta.json 与 PDF 更新 .md，不访问网站。仅处理本地已有 PDF 的预印本。"""
+    global OUTPUT_DIR
+    OUTPUT_DIR = Path(output_dir or OUTPUT_DIR)
+    if not OUTPUT_DIR.is_dir():
+        typer.echo(f"目录不存在: {OUTPUT_DIR}", err=True)
+        raise SystemExit(1)
+
+    ids = collect_ids_with_pdf(OUTPUT_DIR)
+    to_process = ids if limit <= 0 else ids[:limit]
+    typer.echo(f"本地有 PDF 的预印本共 {len(ids)} 篇，本次处理 {len(to_process)} 篇。")
+
+    for aid in tqdm(to_process, desc="更新 .md"):
+        prefix = aid[:2].lower()
+        meta_path = OUTPUT_DIR / "preprints" / prefix / f"{aid}.meta.json"
+        if not meta_path.is_file():
+            continue
+        try:
+            full_meta = json.loads(meta_path.read_text(encoding="utf-8"))
+        except (json.JSONDecodeError, OSError):
+            continue
+        article = full_meta.get("article") if isinstance(full_meta, dict) else None
+        if not article or not isinstance(article, dict):
+            continue
+        save_preprint_article(
+            article,
+            OUTPUT_DIR,
+            comments=full_meta.get("comments") if isinstance(full_meta.get("comments"), list) else None,
+            fetched_at=full_meta.get("fetched_at") or "",
+        )
+        pdf_path = OUTPUT_DIR / "pdfs" / prefix / f"{aid}.pdf"
+        if not pdf_path.is_file():
+            continue
+        subpath = OUTPUT_DIR / "preprints" / prefix
+        if delete_images_before and subpath.is_dir():
+            remove_legacy_images(subpath, aid)
+        images = pdf_to_images(pdf_path, aid, subpath)
+        if images:
+            append_body_images_to_md(subpath / f"{aid}.md", images)
+
+    typer.echo("本地更新完成。已根据 .meta.json 与 PDF 重写 .md 并生成正文图。")
+
+
 app = typer.Typer(help="S.H.I.T Journal 归档同步（API）")
 
 
@@ -569,6 +632,20 @@ def refresh_md_cmd(
         delay=delay,
         delete_images=not no_delete_images,
         all_preprints=all_preprints,
+    )
+
+
+@app.command("update-md-local")
+def update_md_local_cmd(
+    output_dir: Path = typer.Option(OUTPUT_DIR, "--output", "-o", help="归档输出目录"),
+    limit: int = typer.Option(0, "--limit", help="最多处理篇数，0 表示全部"),
+    no_delete_images: bool = typer.Option(False, "--no-delete-images", help="生成正文图前不删除旧截图"),
+) -> None:
+    """凡有 PDF 的预印本：仅用本地 .meta.json 与 PDF 重写 .md 并生成正文图，不访问网站。"""
+    run_update_md_from_local(
+        output_dir=output_dir,
+        limit=limit,
+        delete_images_before=not no_delete_images,
     )
 
 
