@@ -1,7 +1,28 @@
 {
-  "title": "Not found / 未找到",
-  "subtitle": "",
-  "body_text": "🚫\nNot found / 未找到\n返回首页\n⚖️\nUSER NOTICE / 用户须知\nPlease read carefully before proceeding / 使用本网站前请仔细阅读\n欢迎访问 S.H.I.T. Journal。\n本平台为\n非营利性学术与文化讨论社区\n。为保障平台的正常运行、防范恶意攻击及履行必要的合规义务，本网站需使用 Cookie 及同类技术来维持登录状态及安全防护机制。\n鉴于本平台内容的特殊性，您在进入本网站前，必须明确知悉并同意：\n1. 本网站内容仅代表作者个人观点，\n不代表平台立场\n。\n2. 您应当遵守适用法律法规，平台有权根据规则对违规内容采取清理、折叠或移交等措施。\n3. 您在使用本平台服务时产生的一切数据交互，均受本站法律条款约束。\n如您拒绝接受本声明，请立即关闭浏览器标签页并停止访问本站。\n我已年满 18 周岁，并已仔细阅读且同意遵守本平台的\n《用户协议》\n与\n《隐私政策》\n。\nI am over 18 and agree to the Terms of Service and Privacy Policy.\n请先勾选同意声明",
-  "url": "https://shitjournal.org/preprints/0f283551-f349-4ae1-87f3-9394841bacb3",
-  "slug": "0f283551-f349-4ae1-87f3-9394841bacb3"
+  "article": {
+    "id": "0f283551-f349-4ae1-87f3-9394841bacb3",
+    "title": "基于二维计算流体力学的人类粪便入水过程水花飞溅机理与形态优化研究",
+    "file_name": "0f283551-f349-4ae1-87f3-9394841bacb3",
+    "pdf_url": "https://files.shitjournal.org/0f283551-f349-4ae1-87f3-9394841bacb3.pdf",
+    "tag": "meme",
+    "zones": "stone",
+    "status": "passed",
+    "discipline": "engineering",
+    "topic": "nan",
+    "co_authors": [],
+    "suggestions": "",
+    "rating_count": 138,
+    "avg_score": 4.681159420289855,
+    "my_score": null,
+    "created_at": "2026-02-24T02:31:52.230254Z",
+    "author": {
+      "id": "5fdb6db6-c94b-4367-8a02-e8232a0d048b",
+      "display_name": "奇异的树木funkytrees",
+      "avatar_url": null,
+      "institution": "排泄工程大学University of Excrement Engineering (UEE)",
+      "social_media": "bilibili UID:455378630"
+    }
+  },
+  "comments": [],
+  "fetched_at": "2026-03-08T08:40:44Z"
 }
