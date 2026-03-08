@@ -26,8 +26,8 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           lfs: true
 
-      - name: Install Git LFS
-        run: sudo apt-get update && sudo apt-get install -y git-lfs && git lfs install
+      - name: Install Git LFS and poppler (pdftoppm)
+        run: sudo apt-get update && sudo apt-get install -y git-lfs poppler-utils && git lfs install
 
       - name: Set up Python
         uses: actions/setup-python@v5
