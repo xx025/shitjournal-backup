@@ -157,9 +157,12 @@
       pageItems.forEach(function (item) {
         const path = preprintPath(item.slug);
         const li = document.createElement('li');
+        var metaParts = [];
+        if (item.url) metaParts.push('<span class="meta">' + escapeHtml(item.url) + '</span>');
+        if (item.pdf_url) metaParts.push('<a href="' + escapeHtml(item.pdf_url) + '" target="_blank" rel="noopener" class="meta">PDF</a>');
         li.innerHTML = '<a href="' + blobUrl(path) + '" target="_blank" rel="noopener">' +
           '<span class="title">' + escapeHtml(item.title || item.slug) + '</span>' +
-          (item.url ? '<span class="meta">' + escapeHtml(item.url) + '</span>' : '') +
+          (metaParts.length ? metaParts.join(' ') : '') +
           '</a>';
         ul.appendChild(li);
       });

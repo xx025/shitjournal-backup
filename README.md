@@ -30,11 +30,11 @@
 
 ## 归档结构
 
-归档按新闻与预印本分目录存放，每条目含 Markdown 正文与元数据，并维护索引便于检索。
+归档按新闻与预印本分目录存放，每条目含 Markdown 简略说明与 JSON 元数据，并维护索引。预印本 PDF 下载至 `backup/pdfs/{前缀}/{id}.pdf`，由 **Git LFS** 托管以控制仓库体积；需要完整 PDF 时可执行 `git lfs pull`。
 
 ## 同步与触发
 
-- **定时**：每日 UTC 00:00（北京时间 08:00）自动执行一次同步。
+- **定时**：每日北京时间凌晨 1 点自动执行一次同步。
 - **推送触发**：向 `main` 分支 push 时也会触发同步。
 - **手动**：在 GitHub Actions 中选择 “ShitJournal Archive Sync” → “Run workflow” 可立即执行。
 

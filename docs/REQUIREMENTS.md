@@ -31,7 +31,7 @@ flowchart LR
 - **学术可引用**：每篇条目含 URL、标题、作者、单位、学科、提交时间等元数据，便于引用与检索。
 - **去中心化备份**：公开仓库中的归档不依赖单一站点可用性。
 
-**交付物**：公开 Git 仓库中的 `backup/` 目录，内含 Markdown 正文、JSON 元数据及索引文件。
+**交付物**：公开 Git 仓库中的 `backup/` 目录，内含预印本元数据、简略 Markdown 及索引文件；PDF 不存入仓库，通过官网 API 返回的 `pdf_url` 获取（无水印）。
 
 ---
 
@@ -48,7 +48,7 @@ flowchart LR
 
 **不收录**：首页社论、子刊（`/journals`）、投稿（`/submit`）、社区（`/community-guard`）等导航与功能页。
 
-**技术说明**：来源站为 SPA，需在无头浏览器中渲染后解析列表与正文；实现细节见第 5 节。
+**技术说明**：预印本通过官网 API（`api.shitjournal.org`）获取列表与详情，含 `pdf_url` 直链；新闻暂无 API，仅保留既有索引中的新闻条目。
 
 ---
 
@@ -56,21 +56,23 @@ flowchart LR
 
 **根目录**：`backup/`。
 
-**按 id 分子目录**（硬性需求）：
+**存储策略**：预印本 PDF 下载至 **`backup/pdfs/{UUID 前 2 位}/{uuid}.pdf`**，由 **Git LFS** 托管，避免大文件撑大仓库历史；克隆时默认得到 LFS 指针，按需可 `git lfs pull` 拉取完整 PDF。
 
-- **新闻**：以 slug 为 id，按 slug 的**首字母**分目录。
+**按 id 分子目录**：
+
+- **新闻**：以 slug 为 id，按 slug 的**首字母**分目录（沿用既有结构；当前同步不新增新闻，因官网暂无新闻 API）。
   - 路径：`backup/news/{slug 首字母}/{slug}.md`、`backup/news/{slug 首字母}/{slug}.meta.json`
-  - 示例：`backup/news/m/maintenance.md`、`backup/news/g/governance-10.md`
-- **预印本**：以 UUID 为 id，按 UUID 的**前 2 位**（十六进制）分目录。
-  - 路径：`backup/preprints/{UUID 前 2 位}/{uuid}.md`、`backup/preprints/{UUID 前 2 位}/{uuid}.meta.json`
-  - 示例：`backup/preprints/1f/1fd278a6-7895-4c19-9d4e-5fdbb76904a7.md`
+- **预印本**：以 UUID 为 id，按 UUID 的**前 2 位**分目录。
+  - 路径：`backup/preprints/{UUID 前 2 位}/{uuid}.meta.json`、`backup/preprints/{UUID 前 2 位}/{uuid}.md`
+  - `.meta.json`：完整文章元信息，含 `article`（API 返回的完整文章对象）、`comments`（评论列表）、`fetched_at`（抓取时间）。
+  - `.md`：简略说明（标题、作者、机构、提交时间、在线阅读链接、PDF 链接及本仓库归档路径）。
+  - **PDF**：`backup/pdfs/{UUID 前 2 位}/{uuid}.pdf`（Git LFS），与 preprints 同前缀分目录，便于对应。
 
-**索引**：`backup/index.json`，记录已收录的新闻与预印本 URL、slug、标题及最近一次同步时间戳；随每次同步合并更新，用于增量同步时跳过已收录条目。
+**索引**：`backup/index.json`，记录已收录的新闻与预印本（url、slug、title、pdf_url 等）；随每次同步合并更新，用于增量同步时跳过已收录 id。
 
 **元数据要求**：
 
-- **新闻**：URL、标题、副标题；正文以 Markdown 存储。
-- **预印本**：在新闻基础上增加作者（author）、单位（institution）、学科（discipline）、提交时间（submitted）、粘度（viscosity）等字段（与当前实现中的预印本元数据解析一致）。
+- **预印本**：来自 API，含作者（display_name）、单位（institution）、学科（discipline）、提交时间（created_at）、分区（zones）、`pdf_url` 等。
 
 ---
 
@@ -78,15 +80,15 @@ flowchart LR
 
 **三种触发方式**（需全部支持）：
 
-1. **定时**：每日 UTC 00:00（北京时间 08:00）自动执行一次。
+1. **定时**：每日 UTC 17:00（北京时间凌晨 01:00）自动执行一次。
 2. **推送触发**：向 `main` 分支 push 时执行一次。
 3. **手动**：在 GitHub Actions 中选择 “ShitJournal Archive Sync” → “Run workflow” 可立即执行。
 
 **禁止并行**：同一时间只允许一次同步任务执行；使用 `concurrency` 组（如 `shitjournal-archive`）且不取消进行中的运行（`cancel-in-progress: false`），新触发的运行排队等待。
 
-**增量同步**：已收录的 URL 由 `backup/index.json` 记录；每次同步前加载该索引，仅对尚未收录的新闻与预印本 URL 发起请求并写入，避免重复抓取。同步结束后将本次新增条目与原有索引合并写回 `index.json`。
+**增量同步**：已收录的预印本 id 由 `backup/index.json` 记录；每次同步前加载该索引，仅对尚未收录的 id 调用 API 并写入，避免重复请求。同步结束后将本次新增条目与原有索引合并写回 `index.json`。
 
-**增量推送（避免取消后重复）**：在 CI 中可开启 `--push-every N`（如 25），每同步 N 篇预印本（以及新闻完成后）即提交并 push 一次。这样若本次 Action 被取消，已推送的内容会保留在远程，下次 run 会基于最新 index 继续，不会重复下载。
+**增量推送（避免取消后重复）**：在 CI 中可开启 `--push-every N`（如 25），每同步 N 篇预印本即提交并 push 一次；若 Action 被取消，已推送内容保留，下次基于最新 index 继续。
 
 **执行结果**：
 
@@ -99,10 +101,10 @@ flowchart LR
 
 ## 5. 技术约束与实现要点
 
-- **运行环境**：GitHub Actions（`ubuntu-latest`）、Python 3.11、Playwright（Chromium）。
-- **来源站为 SPA**：需在无头浏览器中渲染后解析列表与详情；列表需支持多 zone（`?zone=latrine|septic|stone|sediment`）及分页（`&page=N`）。
-- **输出格式**：正文以 Markdown 存储；元数据以 JSON 存储；文件名与路径须满足「按 id 分目录」规则。
-- **礼貌策略**：请求间隔、固定 User-Agent 等，以减轻对来源站压力；具体实现见 `.github/scripts/sync.py`。
+- **运行环境**：GitHub Actions（`ubuntu-latest`）、Python 3.11；仅依赖标准库与 typer、tqdm，无需浏览器。
+- **数据来源**：官网 API `api.shitjournal.org` — 文章列表（`/api/articles/?zone=…&page=…`）与文章详情（`/api/articles/{id}`），详情含 `pdf_url`。
+- **输出格式**：预印本元数据以 JSON 存储；简略 Markdown 仅含标题、作者、链接；文件名与路径按「UUID 前 2 位」分目录。
+- **礼貌策略**：请求间隔、固定 User-Agent；见 `.github/scripts/sync.py`。
 
 ---
 

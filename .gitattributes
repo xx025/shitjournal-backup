@@ -1,0 +1,2 @@
+# PDF 由 Git LFS 托管，避免仓库体积过大
+backup/pdfs/** filter=lfs diff=lfs merge=lfs -text
