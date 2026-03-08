@@ -388,6 +388,19 @@ def collect_ids_with_legacy_md(out_dir: Path) -> list[str]:
     return sorted(set(ids))
 
 
+def collect_all_preprint_ids_from_index(out_dir: Path) -> list[str]:
+    """从 backup/index.json 读取并返回所有预印本 id 列表。"""
+    index_path = out_dir / "index.json"
+    if not index_path.is_file():
+        return []
+    try:
+        data = json.loads(index_path.read_text(encoding="utf-8"))
+        preprints = data.get("preprints") or []
+        return [p.get("slug") for p in preprints if p.get("slug")]
+    except (json.JSONDecodeError, OSError):
+        return []
+
+
 def remove_legacy_images(subpath: Path, aid: str) -> int:
     """删除该预印本目录下旧版正文截图（{id}-*.png 等），返回删除数量。"""
     removed = 0
@@ -446,18 +459,13 @@ def run_migrate_legacy(
                 prefix = aid[:2].lower()
                 pdf_path = OUTPUT_DIR / "pdfs" / prefix / f"{aid}.pdf"
                 subpath = OUTPUT_DIR / "preprints" / prefix
+                if delete_images and subpath.is_dir():
+                    remove_legacy_images(subpath, aid)
                 images = pdf_to_images(pdf_path, aid, subpath)
                 if images:
                     append_body_images_to_md(subpath / f"{aid}.md", images)
-        if delete_images:
-            prefix = aid[:2].lower()
-            subpath = OUTPUT_DIR / "preprints" / prefix
-            if subpath.is_dir():
-                n = remove_legacy_images(subpath, aid)
-                if n:
-                    typer.echo(f"  已删除 {aid} 下 {n} 张旧截图。")
 
-    typer.echo("迁移完成。索引未改动，仅更新了对应条目的 .meta.json、.md 与 PDF，并移除旧截图。")
+    typer.echo("迁移完成。索引未改动，仅更新了对应条目的 .meta.json、.md 与 PDF、正文图。")
 
 
 def run_refresh_md(
@@ -465,17 +473,23 @@ def run_refresh_md(
     limit: int = 0,
     delay: float = REFRESH_DELAY_SECONDS,
     delete_images: bool = True,
+    all_preprints: bool = False,
 ) -> None:
-    """将 .md 仍含图片引用的预印本用 API 重写为丰富元信息版 .md，并更新 .meta.json、下载 PDF、删除旧截图。"""
+    """将预印本用 API 重写为丰富元信息版 .md，并更新 .meta.json、下载 PDF、正文图。all_preprints 为 True 时从 index 取全部 id。"""
     global OUTPUT_DIR
     OUTPUT_DIR = Path(output_dir or OUTPUT_DIR)
     if not OUTPUT_DIR.is_dir():
         typer.echo(f"目录不存在: {OUTPUT_DIR}", err=True)
         raise SystemExit(1)
 
-    ids = collect_ids_with_legacy_md(OUTPUT_DIR)
-    to_process = ids if limit <= 0 else ids[:limit]
-    typer.echo(f"仍含图片引用的 .md 共 {len(ids)} 篇，本次处理 {len(to_process)} 篇。")
+    if all_preprints:
+        ids = collect_all_preprint_ids_from_index(OUTPUT_DIR)
+        to_process = ids if limit <= 0 else ids[:limit]
+        typer.echo(f"索引中共 {len(ids)} 篇预印本，本次处理 {len(to_process)} 篇。")
+    else:
+        ids = collect_ids_with_legacy_md(OUTPUT_DIR)
+        to_process = ids if limit <= 0 else ids[:limit]
+        typer.echo(f"仍含图片引用的 .md 共 {len(ids)} 篇，本次处理 {len(to_process)} 篇。")
 
     for aid in tqdm(to_process, desc="刷新 .md"):
         time.sleep(delay)
@@ -502,18 +516,13 @@ def run_refresh_md(
                 prefix = aid[:2].lower()
                 pdf_path = OUTPUT_DIR / "pdfs" / prefix / f"{aid}.pdf"
                 subpath = OUTPUT_DIR / "preprints" / prefix
+                if delete_images and subpath.is_dir():
+                    remove_legacy_images(subpath, aid)
                 images = pdf_to_images(pdf_path, aid, subpath)
                 if images:
                     append_body_images_to_md(subpath / f"{aid}.md", images)
-        if delete_images:
-            prefix = aid[:2].lower()
-            subpath = OUTPUT_DIR / "preprints" / prefix
-            if subpath.is_dir():
-                n = remove_legacy_images(subpath, aid)
-                if n:
-                    typer.echo(f"  已删除 {aid} 下 {n} 张旧截图。")
 
-    typer.echo("刷新完成。已更新 .meta.json 与 .md（含丰富元信息），并处理 PDF、旧截图。")
+    typer.echo("刷新完成。已更新 .meta.json 与 .md（含丰富元信息），并处理 PDF、正文图。")
 
 
 app = typer.Typer(help="S.H.I.T Journal 归档同步（API）")
@@ -550,14 +559,16 @@ def refresh_md_cmd(
     output_dir: Path = typer.Option(OUTPUT_DIR, "--output", "-o", help="归档输出目录"),
     limit: int = typer.Option(0, "--limit", help="最多处理篇数，0 表示全部"),
     delay: float = typer.Option(REFRESH_DELAY_SECONDS, "--delay", help="请求间隔秒数，默认 5"),
-    no_delete_images: bool = typer.Option(False, "--no-delete-images", help="不删除旧版正文截图"),
+    no_delete_images: bool = typer.Option(False, "--no-delete-images", help="生成正文图前不删除旧截图"),
+    all_preprints: bool = typer.Option(False, "--all", help="从 index 取全部预印本并刷新（否则仅刷新仍含图片引用的 .md）"),
 ) -> None:
-    """将 .md 仍含图片引用的预印本用 API 重写为丰富元信息版 .md，并更新 .meta.json、下载 PDF。"""
+    """将预印本用 API 重写为丰富元信息版 .md，并更新 .meta.json、下载 PDF、正文图。"""
     run_refresh_md(
         output_dir=output_dir,
         limit=limit,
         delay=delay,
         delete_images=not no_delete_images,
+        all_preprints=all_preprints,
     )
 
 
