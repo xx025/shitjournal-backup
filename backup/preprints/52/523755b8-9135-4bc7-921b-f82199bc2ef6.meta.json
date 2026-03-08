@@ -1,0 +1,28 @@
+{
+  "article": {
+    "id": "523755b8-9135-4bc7-921b-f82199bc2ef6",
+    "title": "递归式学术：基于大语言模型批改“由大语言模型生成的作业”的稳定性预测",
+    "file_name": "523755b8-9135-4bc7-921b-f82199bc2ef6",
+    "pdf_url": "https://files.shitjournal.org/523755b8-9135-4bc7-921b-f82199bc2ef6.pdf",
+    "tag": "meme",
+    "zones": "septic",
+    "status": "passed",
+    "discipline": "engineering",
+    "topic": "nan",
+    "co_authors": [],
+    "suggestions": "",
+    "rating_count": 45,
+    "avg_score": 4.444444444444445,
+    "my_score": null,
+    "created_at": "2026-03-03T17:09:29.016557Z",
+    "author": {
+      "id": "975eddfd-6ec2-492a-83a0-4921d62dfca5",
+      "display_name": "SunnyW.",
+      "avatar_url": null,
+      "institution": "稀泥大学赛博投降与逻辑坍缩研究所",
+      "social_media": "抖音号：TreeNewBee64"
+    }
+  },
+  "comments": [],
+  "fetched_at": "2026-03-08T09:51:04Z"
+}

@@ -203,6 +203,52 @@ def append_body_images_to_md(md_path: Path, image_filenames: list[str]) -> None:
     md_path.write_text(content + "\n".join(lines), encoding="utf-8")
 
 
+def collect_preprints_from_local_meta(out_dir: Path) -> list[dict]:
+    """扫描 backup/preprints 下所有 .meta.json，返回 [{url, slug, title}, ...]，按 created_at 倒序。"""
+    preprints_dir = out_dir / "preprints"
+    if not preprints_dir.is_dir():
+        return []
+    items: list[tuple[str, dict]] = []
+    for prefix_dir in preprints_dir.iterdir():
+        if not prefix_dir.is_dir():
+            continue
+        for meta_file in prefix_dir.glob("*.meta.json"):
+            aid = meta_file.stem.removesuffix(".meta")
+            if len(aid) < 2:
+                continue
+            try:
+                full = json.loads(meta_file.read_text(encoding="utf-8"))
+                article = full.get("article") if isinstance(full, dict) else None
+                if not article or not isinstance(article, dict):
+                    continue
+                created = article.get("created_at") or ""
+                title = article.get("title") or aid
+                items.append((created, {"url": f"https://shitjournal.org/preprints/{aid}", "slug": aid, "title": title}))
+            except (json.JSONDecodeError, OSError):
+                pass
+    items.sort(key=lambda x: x[0], reverse=True)
+    return [entry for _, entry in items]
+
+
+def run_rebuild_index(output_dir: Path | None = None) -> None:
+    """仅用本地 .meta.json 重建 index.json（保留原 news），不访问网站。"""
+    global OUTPUT_DIR
+    OUTPUT_DIR = Path(output_dir or OUTPUT_DIR)
+    if not OUTPUT_DIR.is_dir():
+        typer.echo(f"目录不存在: {OUTPUT_DIR}", err=True)
+        raise SystemExit(1)
+    _, previous = load_existing_index(OUTPUT_DIR)
+    preprints = collect_preprints_from_local_meta(OUTPUT_DIR)
+    index = {
+        "news": previous.get("news", []),
+        "preprints": preprints,
+        "synced_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+    }
+    index_path = OUTPUT_DIR / "index.json"
+    index_path.write_text(json.dumps(index, ensure_ascii=False, indent=2), encoding="utf-8")
+    typer.echo(f"索引已重建: {index_path}（新闻 {len(index['news'])} 篇，预印本 {len(index['preprints'])} 篇）")
+
+
 def load_existing_index(out_dir: Path) -> tuple[set[str], dict]:
     """加载已有 index.json，返回 (已收录预印本 id 集合, 原 index 字典)。"""
     index_path = out_dir / "index.json"
@@ -647,6 +693,14 @@ def update_md_local_cmd(
         limit=limit,
         delete_images_before=not no_delete_images,
     )
+
+
+@app.command("rebuild-index")
+def rebuild_index_cmd(
+    output_dir: Path = typer.Option(OUTPUT_DIR, "--output", "-o", help="归档输出目录"),
+) -> None:
+    """用本地 .meta.json 重建 index.json（保留原 news），不访问网站。"""
+    run_rebuild_index(output_dir=output_dir)
 
 
 if __name__ == "__main__":
