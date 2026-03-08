@@ -13,6 +13,14 @@
 
 ## 链接
 
-- [在线阅读](https://shitjournal.org/preprints/7c5efe6f-eb9d-4969-abb2-d2fd8bf686ec)
-- [PDF 下载（无水印）](https://files.shitjournal.org/7c5efe6f-eb9d-4969-abb2-d2fd8bf686ec.pdf)
-- 本仓库归档: `backup/pdfs/7c/7c5efe6f-eb9d-4969-abb2-d2fd8bf686ec.pdf`
+- [网站原始文章](https://shitjournal.org/preprints/7c5efe6f-eb9d-4969-abb2-d2fd8bf686ec)
+- [PDF](https://files.shitjournal.org/7c5efe6f-eb9d-4969-abb2-d2fd8bf686ec.pdf)
+- [文章元信息](7c5efe6f-eb9d-4969-abb2-d2fd8bf686ec.meta.json)
+
+## 正文
+
+![第1页](7c5efe6f-eb9d-4969-abb2-d2fd8bf686ec-1.png)
+
+![第2页](7c5efe6f-eb9d-4969-abb2-d2fd8bf686ec-2.png)
+
+![第3页](7c5efe6f-eb9d-4969-abb2-d2fd8bf686ec-3.png)
