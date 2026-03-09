@@ -38,7 +38,7 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Sync and archive
-        run: python .github/scripts/sync.py --preprints-limit 100 --push-every 25
+        run: python .github/scripts/sync.py run --preprints-limit 100 --push-every 25
 
       - name: Commit and push archive
         run: |

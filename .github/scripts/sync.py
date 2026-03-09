@@ -22,13 +22,24 @@ DELAY_SECONDS = 0.5
 REFRESH_DELAY_SECONDS = 5.0  # refresh-md / migrate-legacy 批量更新时的请求间隔
 
 PREPRINT_ZONES = ("latrine", "septic", "stone", "sediment")
+RETRY_DELAYS = (5, 10, 20)  # 重试间隔（秒），共 3 次重试
 
 
 def _http_get(url: str) -> dict:
-    """GET JSON，失败抛异常。"""
+    """GET JSON，失败时重试 3 次（间隔 5s、10s、20s），仍失败则抛异常。"""
     req = Request(url, headers={"User-Agent": "ShitJournalBackup/2.0 (+https://github.com; archive bot)"})
-    with urlopen(req, timeout=30) as r:
-        return json.loads(r.read().decode("utf-8"))
+    last_err: Exception | None = None
+    for attempt in range(1 + len(RETRY_DELAYS)):
+        try:
+            with urlopen(req, timeout=30) as r:
+                return json.loads(r.read().decode("utf-8"))
+        except (HTTPError, URLError, OSError, json.JSONDecodeError) as e:
+            last_err = e
+            if attempt < len(RETRY_DELAYS):
+                time.sleep(RETRY_DELAYS[attempt])
+            else:
+                raise last_err
+    raise last_err
 
 
 def fetch_articles_list(zone: str, page: int) -> dict:
@@ -153,14 +164,19 @@ def download_pdf(pdf_url: str, article_id: str, out_dir: Path) -> bool:
     pdf_path = pdf_dir / f"{article_id}.pdf"
     if pdf_path.exists():
         return True
-    try:
-        req = Request(pdf_url, headers={"User-Agent": "ShitJournalBackup/2.0 (+https://github.com; archive bot)"})
-        with urlopen(req, timeout=120) as r:
-            pdf_path.write_bytes(r.read())
-        return True
-    except (HTTPError, URLError, OSError) as e:
-        typer.echo(f"PDF 下载失败 {article_id}: {e}", err=True)
-        return False
+    last_err: Exception | None = None
+    for attempt in range(1 + len(RETRY_DELAYS)):
+        try:
+            req = Request(pdf_url, headers={"User-Agent": "ShitJournalBackup/2.0 (+https://github.com; archive bot)"})
+            with urlopen(req, timeout=120) as r:
+                pdf_path.write_bytes(r.read())
+            return True
+        except (HTTPError, URLError, OSError) as e:
+            last_err = e
+            if attempt < len(RETRY_DELAYS):
+                time.sleep(RETRY_DELAYS[attempt])
+    typer.echo(f"PDF 下载失败 {article_id}（已重试 {len(RETRY_DELAYS)} 次）: {last_err}", err=True)
+    return False
 
 
 def pdf_to_images(pdf_path: Path, article_id: str, preprints_subpath: Path, max_pages: int = 50) -> list[str]:
@@ -702,7 +718,31 @@ def run_retry_pdf(
     typer.echo("重试完成。")
 
 
+def run_status(output_dir: Path | None = None) -> None:
+    """拉取官网数量与本地 index 对比，输出落后篇数（不执行同步）。"""
+    global OUTPUT_DIR
+    OUTPUT_DIR = Path(output_dir or OUTPUT_DIR)
+    if not OUTPUT_DIR.is_dir():
+        typer.echo(f"目录不存在: {OUTPUT_DIR}", err=True)
+        raise SystemExit(1)
+    existing_ids, _ = load_existing_index(OUTPUT_DIR)
+    typer.echo("正在拉取官网预印本列表…")
+    all_ids = collect_all_article_ids()
+    to_fetch = [i for i in all_ids if i not in existing_ids]
+    typer.echo(f"官网共 {len(all_ids)} 篇，本地已收录 {len(existing_ids)} 篇，落后 {len(to_fetch)} 篇（待同步）。")
+    if to_fetch:
+        typer.echo("待同步 id 示例: " + ", ".join(to_fetch[:5]) + (" …" if len(to_fetch) > 5 else ""))
+
+
 app = typer.Typer(help="S.H.I.T Journal 归档同步（API）")
+
+
+@app.command("status")
+def status_cmd(
+    output_dir: Path = typer.Option(OUTPUT_DIR, "--output", "-o", help="归档输出目录"),
+) -> None:
+    """查看官网与本地预印本数量差，即落后多少篇（不执行同步）。"""
+    run_status(output_dir=output_dir)
 
 
 @app.command("run")
