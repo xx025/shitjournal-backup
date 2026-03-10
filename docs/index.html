@@ -12,29 +12,23 @@
   <div class="wrap">
     <header>
       <h1>S.H.I.T Journal 归档</h1>
-      <p>对 S.H.I.T Journal 的新闻与预印本进行长期归档，便于引用与离线访问。</p>
+      <p>对 S.H.I.T Journal 预印本（文章）进行长期归档，便于引用与离线访问。</p>
     </header>
 
-    <section class="section" id="recent-updates-section" style="display: none;">
-      <h2 class="section-title">最近更新</h2>
-      <ul class="list" id="recent-updates-list"></ul>
-    </section>
-
-    <section class="section" id="news-section">
-      <h2 class="section-title">新闻</h2>
-      <ul class="list" id="news-list">
-        <li class="loading">加载中…</li>
-      </ul>
-      <nav class="pagination" id="news-pagination" aria-label="新闻分页"></nav>
-    </section>
-
-    <section class="section" id="preprints-section">
-      <h2 class="section-title">预印本</h2>
-      <ul class="list" id="preprints-list">
-        <li class="loading">加载中…</li>
-      </ul>
-      <nav class="pagination" id="preprints-pagination" aria-label="预印本分页"></nav>
-    </section>
+    <div class="main-layout">
+      <section class="section main-content" id="preprints-section">
+        <h2 class="section-title">预印本</h2>
+        <ul class="list" id="preprints-list">
+          <li class="loading">加载中…</li>
+        </ul>
+        <nav class="pagination" id="preprints-pagination" aria-label="预印本分页"></nav>
+      </section>
+      <aside class="sidebar">
+        <div class="search-bar">
+          <input type="search" id="preprints-search" class="search-input" placeholder="搜索标题或 slug…" aria-label="搜索预印本">
+        </div>
+      </aside>
+    </div>
 
     <footer>
       <p>索引与正文存于 <a href="https://github.com/xx025/shitjournal-backup">GitHub 仓库</a>，内容版权归 S.H.I.T Journal 及原作者所有。</p>
@@ -59,6 +53,10 @@
     var REPO = window.__REPO__ || 'xx025/shitjournal-backup';
     var BRANCH = 'main';
     var PAGE_SIZE = 15;
+    var RAW_CDN = 'https://xget.xi-xu.me/gh';
+    var parts = REPO.split('/');
+    var OWNER = parts[0] || 'xx025';
+    var REPO_NAME = parts[1] || 'shitjournal-backup';
 
     function slugify(s) {
       if (!s) return 'untitled';
@@ -69,13 +67,7 @@
         .slice(0, 80) || 'untitled';
     }
 
-    function newsPath(slug) {
-      const first = (slug && slug[0]) || 'x';
-      const file = slugify(slug) || 'untitled';
-      return `backup/news/${first.toLowerCase()}/${file}.md`;
-    }
-
-    function preprintPath(slug) {
+function preprintPath(slug) {
       if (!slug || slug.length < 2) return `backup/preprints/xx/${slug}.md`;
       const prefix = slug.slice(0, 2).toLowerCase();
       return `backup/preprints/${prefix}/${slug}.md`;
@@ -91,6 +83,13 @@
       return `https://github.com/${REPO}/blob/${BRANCH}/${path}`;
     }
 
+    function pdfCdnUrl(slug) {
+      if (!slug || slug.length < 2) return '';
+      var prefix = slug.slice(0, 2).toLowerCase();
+      var filePath = 'backup/pdfs/' + prefix + '/' + slug + '.pdf';
+      return RAW_CDN + '/' + OWNER + '/' + REPO_NAME + '/raw/refs/heads/' + BRANCH + '/' + filePath;
+    }
+
     function slicePage(items, page) {
       var start = (page - 1) * PAGE_SIZE;
       return items.slice(start, start + PAGE_SIZE);
@@ -100,10 +99,10 @@
       return Math.max(1, Math.ceil(total / PAGE_SIZE));
     }
 
-    function renderPagination(containerId, currentPage, total, onPageChange) {
+    function renderPagination(containerId, currentPage, total, onPageChange, withJump) {
       const nav = document.getElementById(containerId);
       nav.innerHTML = '';
-      if (total <= PAGE_SIZE) return;
+      if (total <= 0) return;
       const pages = totalPages(total);
       const frag = document.createDocumentFragment();
       const prev = document.createElement('button');
@@ -124,30 +123,43 @@
       next.disabled = currentPage >= pages;
       next.addEventListener('click', function () { if (currentPage < pages) onPageChange(currentPage + 1); });
       frag.appendChild(next);
+      if (withJump && pages > 1) {
+        const jumpWrap = document.createElement('span');
+        jumpWrap.className = 'pagination-jump';
+        const inp = document.createElement('input');
+        inp.type = 'text';
+        inp.inputMode = 'numeric';
+        inp.setAttribute('aria-label', '页码');
+        inp.setAttribute('data-max', pages);
+        inp.value = currentPage;
+        const jumpBtn = document.createElement('button');
+        jumpBtn.type = 'button';
+        jumpBtn.className = 'jump-btn';
+        jumpBtn.textContent = '跳转';
+        jumpBtn.addEventListener('click', function () {
+          var p = parseInt(inp.value, 10);
+          var max = pages;
+          if (p >= 1 && p <= max) onPageChange(p);
+          else inp.value = currentPage;
+        });
+        inp.addEventListener('keydown', function (e) {
+          if (e.key === 'Enter') jumpBtn.click();
+        });
+        jumpWrap.appendChild(inp);
+        jumpWrap.appendChild(jumpBtn);
+        frag.appendChild(jumpWrap);
+      }
       nav.appendChild(frag);
     }
 
-    function renderNews(items, page) {
-      page = page || 1;
-      const ul = document.getElementById('news-list');
-      ul.innerHTML = '';
-      if (!items.length) {
-        ul.innerHTML = '<li class="loading">暂无收录</li>';
-        renderPagination('news-pagination', 1, 0, function () {});
-        return;
-      }
-      const pageItems = slicePage(items, page);
-      pageItems.forEach(function (item) {
-        const path = newsPath(item.slug);
-        const li = document.createElement('li');
-        li.innerHTML = '<a href="' + blobUrl(path) + '" target="_blank" rel="noopener">' +
-          '<span class="title">' + escapeHtml(item.title || item.slug) + '</span>' +
-          (item.url ? '<span class="meta">' + escapeHtml(item.url) + '</span>' : '') +
-          '</a>';
-        ul.appendChild(li);
-      });
-      renderPagination('news-pagination', page, items.length, function (p) {
-        renderNews(window.__newsItems__ || [], p);
+    function getPreprintList() {
+      var raw = window.__preprintItems__ || [];
+      var q = (window.__preprintSearch__ || '').trim().toLowerCase();
+      if (!q) return raw;
+      return raw.filter(function (item) {
+        var title = (item.title || '').toLowerCase();
+        var slug = (item.slug || '').toLowerCase();
+        return title.indexOf(q) !== -1 || slug.indexOf(q) !== -1;
       });
     }
 
@@ -156,8 +168,8 @@
       const ul = document.getElementById('preprints-list');
       ul.innerHTML = '';
       if (!items.length) {
-        ul.innerHTML = '<li class="loading">暂无收录</li>';
-        renderPagination('preprints-pagination', 1, 0, function () {});
+        ul.innerHTML = '<li class="loading">' + (window.__preprintSearch__ ? '无匹配结果' : '暂无收录') + '</li>';
+        renderPagination('preprints-pagination', 1, 0, function () {}, true);
         return;
       }
       const pageItems = slicePage(items, page);
@@ -168,15 +180,15 @@
         const li = document.createElement('li');
         var linkParts = [];
         linkParts.push('<a href="' + escapeHtml(originUrl) + '" target="_blank" rel="noopener" class="list-link">[原文链接]</a>');
-        if (item.pdf_url) linkParts.push('<a href="' + escapeHtml(item.pdf_url) + '" target="_blank" rel="noopener" class="list-link">[PDF下载]</a>');
+        if (item.pdf_url) linkParts.push('<a href="' + escapeHtml(pdfCdnUrl(item.slug)) + '" target="_blank" rel="noopener" class="list-link">[PDF下载]</a>');
         linkParts.push('<a href="' + blobUrl(metaPath) + '" target="_blank" rel="noopener" class="list-link">[元信息]</a>');
         li.innerHTML = '<a href="' + previewUrl + '" class="list-title">' + escapeHtml(item.title || item.slug) + '</a>' +
           '<span class="list-links">' + linkParts.join(' ') + '</span>';
         ul.appendChild(li);
       });
       renderPagination('preprints-pagination', page, items.length, function (p) {
-        renderPreprints(window.__preprintItems__ || [], p);
-      });
+        renderPreprints(getPreprintList(), p);
+      }, true);
     }
 
     function escapeHtml(s) {
@@ -204,51 +216,28 @@
         return decodeURIComponent(escape(binary));
       }
     }
-    var RECENT_NEWS_COUNT = 1;
-    var RECENT_PREPRINTS_COUNT = 5;
-
-    function renderRecentUpdatesFromIndex(newsItems, preprintItems) {
-      var recentNews = (newsItems || []).slice(0, RECENT_NEWS_COUNT);
-      var recentPreprints = (preprintItems || []).slice(0, RECENT_PREPRINTS_COUNT);
-      if (recentNews.length === 0 && recentPreprints.length === 0) return;
-      var section = document.getElementById('recent-updates-section');
-      var ul = document.getElementById('recent-updates-list');
-      if (!section || !ul) return;
-      ul.innerHTML = '';
-      recentNews.forEach(function (item) {
-        var path = newsPath(item.slug);
-        var li = document.createElement('li');
-        li.innerHTML = '<a href="' + blobUrl(path) + '" target="_blank" rel="noopener">' +
-          '<span class="title">' + escapeHtml(item.title || item.slug) + '</span>' +
-          '<span class="meta">新闻</span>' +
-          '</a>';
-        ul.appendChild(li);
-      });
-      recentPreprints.forEach(function (item) {
-        var path = preprintPath(item.slug);
-        var li = document.createElement('li');
-        li.innerHTML = '<a href="' + blobUrl(path) + '" target="_blank" rel="noopener">' +
-          '<span class="title">' + escapeHtml(item.title || item.slug) + '</span>' +
-          '<span class="meta">预印本</span>' +
-          '</a>';
-        ul.appendChild(li);
-      });
-      section.style.display = 'block';
-    }
-
-    function applyIndex(index) {
-      var newsRaw = index.news || [];
+function applyIndex(index) {
+      if (!index || typeof index !== "object") {
+        onIndexError(new Error('索引格式无效'));
+        return;
+      }
       var preprintsRaw = index.preprints || [];
-      window.__newsItems__ = newsRaw.slice().reverse();
-      window.__preprintItems__ = preprintsRaw.slice().reverse();
-      renderNews(window.__newsItems__, 1);
+      window.__preprintItems__ = Array.isArray(preprintsRaw) ? preprintsRaw.slice().reverse() : [];
+      window.__preprintSearch__ = '';
       renderPreprints(window.__preprintItems__, 1);
-      renderRecentUpdatesFromIndex(window.__newsItems__, window.__preprintItems__);
+      var searchEl = document.getElementById('preprints-search');
+      if (searchEl && !searchEl._bound) {
+        searchEl._bound = true;
+        searchEl.addEventListener('input', function () {
+          window.__preprintSearch__ = searchEl.value;
+          renderPreprints(getPreprintList(), 1);
+        });
+      }
+      return index;
     }
     function onIndexError(err) {
-      renderNews([]);
       renderPreprints([]);
-      showError('news-section', '无法加载索引：' + (err.message || '请稍后重试'));
+      showError('preprints-section', '无法加载索引：' + (err.message || '请稍后重试'));
     }
     // 优先使用导出的本地 data/index.json，失败再走 GitHub API
     fetch('data/index.json')
