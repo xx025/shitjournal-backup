@@ -11,18 +11,16 @@
     "topic": "nan",
     "co_authors": [],
     "suggestions": "",
-    "rating_count": 45,
-    "avg_score": 4.155555555555556,
+    "rating_count": 46,
+    "avg_score": 4.173913043478261,
     "my_score": null,
     "created_at": "2026-03-04T05:43:22.118454Z",
     "author": {
       "id": "a9742973-56fb-43bd-9bb5-de5848f6eccb",
       "display_name": "甘露糖",
-      "avatar_url": null,
-      "institution": "双鸭山大学",
-      "social_media": "2070720403/2201413068"
+      "avatar_url": null
     }
   },
   "comments": [],
-  "fetched_at": "2026-03-08T08:59:44Z"
+  "fetched_at": "2026-03-10T16:01:01Z"
 }

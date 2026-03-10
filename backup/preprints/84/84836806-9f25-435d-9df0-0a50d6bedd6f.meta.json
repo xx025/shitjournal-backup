@@ -11,18 +11,16 @@
     "topic": "nan",
     "co_authors": [],
     "suggestions": "",
-    "rating_count": 7,
-    "avg_score": 4.142857142857143,
+    "rating_count": 20,
+    "avg_score": 3.9,
     "my_score": null,
     "created_at": "2026-03-03T09:30:49.646647Z",
     "author": {
       "id": "4dc90ae3-ab5e-4054-a09b-6e008c4e629a",
       "display_name": "巨能拉",
-      "avatar_url": null,
-      "institution": "二食堂二楼",
-      "social_media": "bcptdtptpdjl"
+      "avatar_url": null
     }
   },
   "comments": [],
-  "fetched_at": "2026-03-08T09:23:58Z"
+  "fetched_at": "2026-03-10T16:11:11Z"
 }

@@ -5,24 +5,22 @@
     "file_name": "bbef56b2-fd2d-4dcc-80c0-3f92aae84444",
     "pdf_url": "https://files.shitjournal.org/bbef56b2-fd2d-4dcc-80c0-3f92aae84444.pdf",
     "tag": "meme",
-    "zones": "latrine",
+    "zones": "sediment",
     "status": "passed",
     "discipline": "science",
     "topic": "nan",
     "co_authors": [],
     "suggestions": "",
-    "rating_count": 24,
-    "avg_score": 2.8333333333333335,
+    "rating_count": 31,
+    "avg_score": 2.838709677419355,
     "my_score": null,
     "created_at": "2026-03-03T13:25:30.854397Z",
     "author": {
       "id": "ecb16f6a-5a49-4e22-bcff-39ef34b211a7",
       "display_name": "Mrs.艾拉士.德卞泰",
-      "avatar_url": null,
-      "institution": "世界排泄物研究中心",
-      "social_media": "Fuckbook"
+      "avatar_url": null
     }
   },
   "comments": [],
-  "fetched_at": "2026-03-08T09:15:29Z"
+  "fetched_at": "2026-03-10T16:10:01Z"
 }

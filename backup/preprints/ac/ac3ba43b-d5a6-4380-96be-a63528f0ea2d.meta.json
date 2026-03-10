@@ -11,18 +11,16 @@
     "topic": "nan",
     "co_authors": [],
     "suggestions": "",
-    "rating_count": 43,
-    "avg_score": 4.3023255813953485,
+    "rating_count": 45,
+    "avg_score": 4.333333333333333,
     "my_score": null,
     "created_at": "2026-03-03T18:21:20.603263Z",
     "author": {
       "id": "f6950d73-2611-4cac-b6eb-8ee6c5248f88",
       "display_name": "夜郎少女的梦",
-      "avatar_url": null,
-      "institution": "每个人心中那段小有遗憾的幸福时光",
-      "social_media": "wzs20030901"
+      "avatar_url": null
     }
   },
   "comments": [],
-  "fetched_at": "2026-03-08T09:12:34Z"
+  "fetched_at": "2026-03-10T16:04:51Z"
 }

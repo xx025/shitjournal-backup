@@ -11,18 +11,16 @@
     "topic": "nan",
     "co_authors": [],
     "suggestions": "",
-    "rating_count": 55,
-    "avg_score": 4.381818181818182,
+    "rating_count": 57,
+    "avg_score": 4.385964912280702,
     "my_score": null,
     "created_at": "2026-03-03T14:03:10.914258Z",
     "author": {
       "id": "2db6b775-d260-4228-9fd0-ff58ba983c40",
       "display_name": "Shit_Producer",
-      "avatar_url": null,
-      "institution": "University of Shit Columbia",
-      "social_media": null
+      "avatar_url": null
     }
   },
   "comments": [],
-  "fetched_at": "2026-03-08T09:05:37Z"
+  "fetched_at": "2026-03-10T16:09:50Z"
 }

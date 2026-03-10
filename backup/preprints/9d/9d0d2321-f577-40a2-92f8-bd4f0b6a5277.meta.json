@@ -11,18 +11,16 @@
     "topic": "nan",
     "co_authors": [],
     "suggestions": "",
-    "rating_count": 48,
-    "avg_score": 3.6041666666666665,
+    "rating_count": 51,
+    "avg_score": 3.607843137254902,
     "my_score": null,
     "created_at": "2026-03-03T16:23:37.830642Z",
     "author": {
       "id": "c2ac9be9-25b2-44f1-b5a8-c89c3bd5b1b9",
       "display_name": "阿泓",
-      "avatar_url": null,
-      "institution": "Wild Chicken University 荒诞应用语言学研究小组",
-      "social_media": "抖音号：Lhj2627002672"
+      "avatar_url": null
     }
   },
   "comments": [],
-  "fetched_at": "2026-03-08T09:07:33Z"
+  "fetched_at": "2026-03-10T16:08:50Z"
 }

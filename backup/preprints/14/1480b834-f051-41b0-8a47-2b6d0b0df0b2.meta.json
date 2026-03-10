@@ -11,18 +11,16 @@
     "topic": "nan",
     "co_authors": [],
     "suggestions": "",
-    "rating_count": 1354,
-    "avg_score": 4.848596750369277,
+    "rating_count": 1378,
+    "avg_score": 4.851233671988389,
     "my_score": null,
     "created_at": "2026-02-27T15:58:33.380062Z",
     "author": {
       "id": "50499309-5ef4-48d0-9b6c-27a54118333c",
       "display_name": "holy shit",
-      "avatar_url": null,
-      "institution": "The XYY University",
-      "social_media": "589437106"
+      "avatar_url": null
     }
   },
   "comments": [],
-  "fetched_at": "2026-03-08T08:40:53Z"
+  "fetched_at": "2026-03-10T16:13:33Z"
 }

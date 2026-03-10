@@ -11,18 +11,16 @@
     "topic": "nan",
     "co_authors": [],
     "suggestions": "",
-    "rating_count": 48,
-    "avg_score": 4.25,
+    "rating_count": 51,
+    "avg_score": 4.176470588235294,
     "my_score": null,
     "created_at": "2026-03-04T08:51:38.560576Z",
     "author": {
       "id": "beca32aa-ed2f-4544-9921-4444edbf7806",
       "display_name": "韩侂史",
-      "avatar_url": null,
-      "institution": "良子大学",
-      "social_media": "48858993"
+      "avatar_url": null
     }
   },
   "comments": [],
-  "fetched_at": "2026-03-08T08:57:47Z"
+  "fetched_at": "2026-03-10T16:13:13Z"
 }

@@ -11,18 +11,16 @@
     "topic": "nan",
     "co_authors": [],
     "suggestions": "",
-    "rating_count": 42,
-    "avg_score": 4.071428571428571,
+    "rating_count": 43,
+    "avg_score": 4.069767441860465,
     "my_score": null,
     "created_at": "2026-03-03T16:26:16.525314Z",
     "author": {
       "id": "fb9aef58-ddbc-451b-bf21-fa5cb35544cd",
       "display_name": "洛雨竹",
-      "avatar_url": null,
-      "institution": "Laplace Scientific Computing Center ",
-      "social_media": null
+      "avatar_url": null
     }
   },
   "comments": [],
-  "fetched_at": "2026-03-08T09:23:57Z"
+  "fetched_at": "2026-03-10T16:08:39Z"
 }

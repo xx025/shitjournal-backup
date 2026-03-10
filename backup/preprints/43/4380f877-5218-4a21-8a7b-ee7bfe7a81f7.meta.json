@@ -11,18 +11,16 @@
     "topic": "nan",
     "co_authors": [],
     "suggestions": "",
-    "rating_count": 235,
-    "avg_score": 4.8382978723404255,
+    "rating_count": 238,
+    "avg_score": 4.8277310924369745,
     "my_score": null,
     "created_at": "2026-03-02T07:05:57.091055Z",
     "author": {
       "id": "e7886f6c-4be6-42ba-b6a1-1b34e7702da9",
       "display_name": "丰川翔",
-      "avatar_url": null,
-      "institution": "木柜子乐队",
-      "social_media": null
+      "avatar_url": null
     }
   },
   "comments": [],
-  "fetched_at": "2026-03-08T08:53:35Z"
+  "fetched_at": "2026-03-10T16:12:12Z"
 }

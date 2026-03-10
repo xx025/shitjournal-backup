@@ -11,18 +11,16 @@
     "topic": "nan",
     "co_authors": [],
     "suggestions": "",
-    "rating_count": 40,
-    "avg_score": 3.75,
+    "rating_count": 43,
+    "avg_score": 3.7906976744186047,
     "my_score": null,
     "created_at": "2026-03-05T12:18:00.765622Z",
     "author": {
       "id": "a29d00dd-31cc-4fbb-ac6c-e4b93b57d3b6",
       "display_name": "我本是我沐",
-      "avatar_url": null,
-      "institution": "星炬学院数字生命研究部",
-      "social_media": "（抖音：ACB3KBQ）（B站：我本是我沐）"
+      "avatar_url": null
     }
   },
   "comments": [],
-  "fetched_at": "2026-03-08T08:26:22Z"
+  "fetched_at": "2026-03-10T16:12:09Z"
 }

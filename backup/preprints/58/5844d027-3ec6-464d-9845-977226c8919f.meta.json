@@ -11,18 +11,16 @@
     "topic": "nan",
     "co_authors": [],
     "suggestions": "",
-    "rating_count": 40,
-    "avg_score": 4.35,
+    "rating_count": 41,
+    "avg_score": 4.341463414634147,
     "my_score": null,
     "created_at": "2026-03-03T17:17:20.830219Z",
     "author": {
       "id": "3a207534-9e69-4337-ad8f-54eb38842ce1",
       "display_name": "Mr晨",
-      "avatar_url": null,
-      "institution": "校园量子迷惑学与无效社交行为研究院",
-      "social_media": null
+      "avatar_url": null
     }
   },
   "comments": [],
-  "fetched_at": "2026-03-08T08:56:23Z"
+  "fetched_at": "2026-03-10T16:07:17Z"
 }

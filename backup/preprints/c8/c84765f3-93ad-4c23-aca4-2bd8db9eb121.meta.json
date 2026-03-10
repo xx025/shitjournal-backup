@@ -11,18 +11,16 @@
     "topic": "nan",
     "co_authors": [],
     "suggestions": "",
-    "rating_count": 252,
-    "avg_score": 4.523809523809524,
+    "rating_count": 254,
+    "avg_score": 4.5236220472440944,
     "my_score": null,
     "created_at": "2026-02-28T02:39:19.305630Z",
     "author": {
       "id": "232c7ccb-f12e-4c91-af97-b42820c09a4a",
       "display_name": "拉屎通畅",
-      "avatar_url": null,
-      "institution": "人类异端行为研究所",
-      "social_media": "抖音@哈基陽"
+      "avatar_url": null
     }
   },
   "comments": [],
-  "fetched_at": "2026-03-08T09:17:36Z"
+  "fetched_at": "2026-03-10T16:13:10Z"
 }

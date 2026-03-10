@@ -11,18 +11,16 @@
     "topic": "nan",
     "co_authors": [],
     "suggestions": "",
-    "rating_count": 64,
-    "avg_score": 3.890625,
+    "rating_count": 68,
+    "avg_score": 3.911764705882353,
     "my_score": null,
     "created_at": "2026-03-03T19:14:53.175653Z",
     "author": {
       "id": "1f6e6dba-8359-4885-aa39-504bd24b2bfd",
       "display_name": "赤石大王",
-      "avatar_url": null,
-      "institution": "家里蹲大学",
-      "social_media": "Archori"
+      "avatar_url": null
     }
   },
   "comments": [],
-  "fetched_at": "2026-03-08T09:05:27Z"
+  "fetched_at": "2026-03-10T16:03:48Z"
 }

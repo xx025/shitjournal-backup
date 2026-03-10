@@ -11,18 +11,16 @@
     "topic": "nan",
     "co_authors": [],
     "suggestions": "",
-    "rating_count": 38,
-    "avg_score": 4.526315789473684,
+    "rating_count": 41,
+    "avg_score": 4.390243902439025,
     "my_score": null,
     "created_at": "2026-03-04T03:45:56.889515Z",
     "author": {
       "id": "6d14ec2d-66aa-4e60-a0e9-a696053d51b1",
       "display_name": "胡说八道",
-      "avatar_url": null,
-      "institution": "浪漫运筹研究所, 福州大学, 福州, 中国",
-      "social_media": "小红书：Dr_hu4869"
+      "avatar_url": null
     }
   },
   "comments": [],
-  "fetched_at": "2026-03-08T09:05:53Z"
+  "fetched_at": "2026-03-10T16:01:12Z"
 }

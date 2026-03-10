@@ -11,18 +11,16 @@
     "topic": "nan",
     "co_authors": [],
     "suggestions": "",
-    "rating_count": 64,
-    "avg_score": 3.34375,
+    "rating_count": 66,
+    "avg_score": 3.287878787878788,
     "my_score": null,
     "created_at": "2026-03-03T16:08:58.733395Z",
     "author": {
       "id": "30e4c1da-7ac7-424f-824c-b7ef1a536a41",
       "display_name": "SAwassnn",
-      "avatar_url": null,
-      "institution": "TCU",
-      "social_media": null
+      "avatar_url": null
     }
   },
   "comments": [],
-  "fetched_at": "2026-03-08T09:02:06Z"
+  "fetched_at": "2026-03-10T16:09:16Z"
 }

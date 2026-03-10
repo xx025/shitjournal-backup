@@ -11,18 +11,16 @@
     "topic": "nan",
     "co_authors": [],
     "suggestions": "",
-    "rating_count": 219,
-    "avg_score": 4.534246575342466,
+    "rating_count": 220,
+    "avg_score": 4.536363636363636,
     "my_score": null,
     "created_at": "2026-02-27T22:01:47.256377Z",
     "author": {
       "id": "1fd5ad91-0f4e-41cb-94ae-2984cca76485",
       "display_name": "mahpmice",
-      "avatar_url": null,
-      "institution": "意义荒原研究所",
-      "social_media": null
+      "avatar_url": null
     }
   },
   "comments": [],
-  "fetched_at": "2026-03-08T08:26:21Z"
+  "fetched_at": "2026-03-10T16:13:22Z"
 }
