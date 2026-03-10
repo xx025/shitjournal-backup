@@ -11,18 +11,16 @@
     "topic": "nan",
     "co_authors": [],
     "suggestions": "",
-    "rating_count": 572,
-    "avg_score": 4.840909090909091,
+    "rating_count": 579,
+    "avg_score": 4.842832469775475,
     "my_score": null,
     "created_at": "2026-02-25T10:19:11.915854Z",
     "author": {
       "id": "3fc31650-43c3-49ea-aa09-4295cfe6ec58",
       "display_name": "Dr.TonyJ",
-      "avatar_url": null,
-      "institution": "T.J.F.S. Group",
-      "social_media": null
+      "avatar_url": null
     }
   },
   "comments": [],
-  "fetched_at": "2026-03-08T09:08:10Z"
+  "fetched_at": "2026-03-10T16:14:42Z"
 }

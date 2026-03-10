@@ -11,18 +11,16 @@
     "topic": "nan",
     "co_authors": [],
     "suggestions": "",
-    "rating_count": 49,
-    "avg_score": 4.755102040816326,
+    "rating_count": 51,
+    "avg_score": 4.764705882352941,
     "my_score": null,
     "created_at": "2026-03-03T20:17:50.810442Z",
     "author": {
       "id": "e0f84b4e-2d04-464d-b9e9-48b081ce95b4",
       "display_name": "今州拉屎侠",
-      "avatar_url": null,
-      "institution": "华胥学院今州分院",
-      "social_media": "@拉屎侠_今州分侠"
+      "avatar_url": null
     }
   },
   "comments": [],
-  "fetched_at": "2026-03-08T09:14:36Z"
+  "fetched_at": "2026-03-10T16:02:58Z"
 }

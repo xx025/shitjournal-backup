@@ -236,25 +236,38 @@
       section.style.display = 'block';
     }
 
-    fetch('https://api.github.com/repos/' + REPO + '/contents/backup/index.json?ref=' + BRANCH)
-      .then(function (r) { return r.json(); })
-      .then(function (data) {
-        if (data.message) throw new Error(data.message);
-        var raw = base64ToUtf8(data.content);
-        var index = JSON.parse(raw);
-        var newsRaw = index.news || [];
-        var preprintsRaw = index.preprints || [];
-        window.__newsItems__ = newsRaw.slice().reverse();
-        window.__preprintItems__ = preprintsRaw.slice().reverse();
-        renderNews(window.__newsItems__, 1);
-        renderPreprints(window.__preprintItems__, 1);
-        renderRecentUpdatesFromIndex(window.__newsItems__, window.__preprintItems__);
+    function applyIndex(index) {
+      var newsRaw = index.news || [];
+      var preprintsRaw = index.preprints || [];
+      window.__newsItems__ = newsRaw.slice().reverse();
+      window.__preprintItems__ = preprintsRaw.slice().reverse();
+      renderNews(window.__newsItems__, 1);
+      renderPreprints(window.__preprintItems__, 1);
+      renderRecentUpdatesFromIndex(window.__newsItems__, window.__preprintItems__);
+    }
+    function onIndexError(err) {
+      renderNews([]);
+      renderPreprints([]);
+      showError('news-section', '无法加载索引：' + (err.message || '请稍后重试'));
+    }
+    // 优先使用导出的本地 data/index.json，失败再走 GitHub API
+    fetch('data/index.json')
+      .then(function (r) {
+        if (r.ok) return r.text().then(function (text) { return JSON.parse(text); });
+        throw new Error('本地索引不存在');
       })
-      .catch(function (err) {
-        renderNews([]);
-        renderPreprints([]);
-        showError('news-section', '无法加载索引：' + (err.message || '请稍后重试'));
-      });
+      .then(applyIndex)
+      .catch(function () {
+        return fetch('https://api.github.com/repos/' + REPO + '/contents/backup/index.json?ref=' + BRANCH)
+          .then(function (r) { return r.json(); })
+          .then(function (data) {
+            if (data.message) throw new Error(data.message);
+            var raw = base64ToUtf8(data.content);
+            return JSON.parse(raw);
+          });
+      })
+      .then(applyIndex)
+      .catch(onIndexError);
   </script>
 </body>
 </html>

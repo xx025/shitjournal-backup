@@ -11,18 +11,16 @@
     "topic": "nan",
     "co_authors": [],
     "suggestions": "",
-    "rating_count": 111,
-    "avg_score": 4.702702702702703,
+    "rating_count": 117,
+    "avg_score": 4.7094017094017095,
     "my_score": null,
     "created_at": "2026-03-04T03:23:51.066574Z",
     "author": {
       "id": "86a7bf82-76e4-4b26-8b70-1945c50566ad",
       "display_name": "s.h.i.t候选院士",
-      "avatar_url": null,
-      "institution": "S.H.I.T. 研究院暧昧关系动力学研究中心",
-      "social_media": null
+      "avatar_url": null
     }
   },
   "comments": [],
-  "fetched_at": "2026-03-08T09:25:11Z"
+  "fetched_at": "2026-03-10T16:01:24Z"
 }

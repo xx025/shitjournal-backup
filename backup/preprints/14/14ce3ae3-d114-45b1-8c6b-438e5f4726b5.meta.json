@@ -11,18 +11,16 @@
     "topic": "nan",
     "co_authors": [],
     "suggestions": "",
-    "rating_count": 71,
-    "avg_score": 3.267605633802817,
+    "rating_count": 75,
+    "avg_score": 3.32,
     "my_score": null,
     "created_at": "2026-03-03T19:17:50.504707Z",
     "author": {
       "id": "cf064f7e-31e3-4545-ab36-e38583f136a7",
       "display_name": "构思一坨",
-      "avatar_url": null,
-      "institution": "佳木斯最高端小区",
-      "social_media": "E.mail:3851004878@qq.com"
+      "avatar_url": null
     }
   },
   "comments": [],
-  "fetched_at": "2026-03-08T08:25:43Z"
+  "fetched_at": "2026-03-10T16:03:37Z"
 }

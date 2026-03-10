@@ -11,18 +11,16 @@
     "topic": "nan",
     "co_authors": [],
     "suggestions": "",
-    "rating_count": 40,
-    "avg_score": 4.275,
+    "rating_count": 41,
+    "avg_score": 4.2926829268292686,
     "my_score": null,
     "created_at": "2026-03-04T01:14:05.926808Z",
     "author": {
       "id": "4c06800c-7b14-4a99-99db-2f47aa44cefc",
       "display_name": "Родители Вячеслава Баранникова",
-      "avatar_url": null,
-      "institution": "КБ «Точка D»",
-      "social_media": null
+      "avatar_url": null
     }
   },
   "comments": [],
-  "fetched_at": "2026-03-08T09:26:25Z"
+  "fetched_at": "2026-03-10T16:01:59Z"
 }

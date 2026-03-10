@@ -11,18 +11,16 @@
     "topic": "nan",
     "co_authors": [],
     "suggestions": "",
-    "rating_count": 42,
-    "avg_score": 4.4523809523809526,
+    "rating_count": 44,
+    "avg_score": 4.454545454545454,
     "my_score": null,
     "created_at": "2026-03-04T02:18:23.496937Z",
     "author": {
       "id": "72aff620-db99-42e4-876f-e27f7c6f35b6",
       "display_name": "雷霆弟",
-      "avatar_url": null,
-      "institution": null,
-      "social_media": null
+      "avatar_url": null
     }
   },
   "comments": [],
-  "fetched_at": "2026-03-08T09:26:14Z"
+  "fetched_at": "2026-03-10T16:01:36Z"
 }

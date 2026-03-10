@@ -11,18 +11,16 @@
     "topic": "nan",
     "co_authors": [],
     "suggestions": "",
-    "rating_count": 182,
-    "avg_score": 4.587912087912088,
+    "rating_count": 184,
+    "avg_score": 4.586956521739131,
     "my_score": null,
     "created_at": "2026-03-01T19:09:12.285649Z",
     "author": {
       "id": "99ac9fe9-359a-4ab6-8fc2-bf9ed0c6227b",
       "display_name": "有酒窝的小饿鱼",
-      "avatar_url": null,
-      "institution": "为什么她只钓我不钓你大学",
-      "social_media": null
+      "avatar_url": null
     }
   },
   "comments": [],
-  "fetched_at": "2026-03-08T08:52:47Z"
+  "fetched_at": "2026-03-10T16:12:36Z"
 }

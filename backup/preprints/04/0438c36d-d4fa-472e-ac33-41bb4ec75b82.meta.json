@@ -11,18 +11,16 @@
     "topic": "nan",
     "co_authors": [],
     "suggestions": "",
-    "rating_count": 33,
-    "avg_score": 4.636363636363637,
+    "rating_count": 35,
+    "avg_score": 4.6571428571428575,
     "my_score": null,
     "created_at": "2026-03-03T19:42:21.731443Z",
     "author": {
       "id": "02136307-0ee2-43fa-9e65-7775e1f87a3a",
       "display_name": "匿跌老湾",
-      "avatar_url": null,
-      "institution": "VORLANT职业技术学院",
-      "social_media": "dy4nfh8b8i1g"
+      "avatar_url": null
     }
   },
   "comments": [],
-  "fetched_at": "2026-03-08T08:25:27Z"
+  "fetched_at": "2026-03-10T16:03:12Z"
 }

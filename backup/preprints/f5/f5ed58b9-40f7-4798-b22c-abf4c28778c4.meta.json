@@ -11,18 +11,16 @@
     "topic": "nan",
     "co_authors": [],
     "suggestions": "",
-    "rating_count": 19,
-    "avg_score": 4.052631578947368,
+    "rating_count": 24,
+    "avg_score": 4.125,
     "my_score": null,
     "created_at": "2026-02-22T14:27:59.999401Z",
     "author": {
       "id": "63e8b487-0c06-42a0-8835-ab58f399a4a1",
       "display_name": "Shabo Cheng",
-      "avatar_url": null,
-      "institution": "量子如厕学研究所",
-      "social_media": null
+      "avatar_url": null
     }
   },
   "comments": [],
-  "fetched_at": "2026-03-08T09:24:49Z"
+  "fetched_at": "2026-03-10T16:15:59Z"
 }

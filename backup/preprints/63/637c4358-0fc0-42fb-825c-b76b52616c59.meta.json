@@ -11,18 +11,16 @@
     "topic": "nan",
     "co_authors": [],
     "suggestions": "",
-    "rating_count": 102,
-    "avg_score": 4.7254901960784315,
+    "rating_count": 104,
+    "avg_score": 4.730769230769231,
     "my_score": null,
     "created_at": "2026-03-02T06:56:48.665357Z",
     "author": {
       "id": "8ee30e80-9d01-403d-8d40-1c72ecbdb8d1",
       "display_name": "XX",
-      "avatar_url": null,
-      "institution": "University of Paid Slacking, UK",
-      "social_media": "抖音 @Xh （账号：chen088888822）小红书@X.（账号：508476875））"
+      "avatar_url": null
     }
   },
   "comments": [],
-  "fetched_at": "2026-03-08T08:58:09Z"
+  "fetched_at": "2026-03-10T16:12:24Z"
 }

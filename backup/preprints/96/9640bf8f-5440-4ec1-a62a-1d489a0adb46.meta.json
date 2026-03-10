@@ -11,18 +11,16 @@
     "topic": "nan",
     "co_authors": [],
     "suggestions": "",
-    "rating_count": 34,
-    "avg_score": 4.294117647058823,
+    "rating_count": 35,
+    "avg_score": 4.314285714285714,
     "my_score": null,
     "created_at": "2026-03-03T18:15:15.169528Z",
     "author": {
       "id": "effdbdb2-b6f8-48cf-be9f-b52ce47f43bd",
       "display_name": "传奇学术垃圾",
-      "avatar_url": null,
-      "institution": "HZZ111研究所",
-      "social_media": null
+      "avatar_url": null
     }
   },
   "comments": [],
-  "fetched_at": "2026-03-08T09:06:04Z"
+  "fetched_at": "2026-03-10T16:05:20Z"
 }

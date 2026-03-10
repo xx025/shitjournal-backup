@@ -505,14 +505,59 @@ def collect_ids_missing_pdf(out_dir: Path) -> list[str]:
     return sorted(set(missing))
 
 
-def remove_legacy_images(subpath: Path, aid: str) -> int:
-    """删除该预印本目录下旧版正文截图（{id}-*.png 等），返回删除数量。"""
+def collect_ids_has_pdf_no_images(out_dir: Path) -> list[str]:
+    """扫描 backup/pdfs：本地有 PDF 但 preprints 目录下无对应正文图（{id}-1.png）的预印本 id 列表。"""
+    pdfs_dir = out_dir / "pdfs"
+    preprints_dir = out_dir / "preprints"
+    if not pdfs_dir.is_dir() or not preprints_dir.is_dir():
+        return []
+    missing: list[str] = []
+    for prefix_dir in pdfs_dir.iterdir():
+        if not prefix_dir.is_dir():
+            continue
+        for pdf_file in prefix_dir.glob("*.pdf"):
+            aid = pdf_file.stem
+            if len(aid) < 2:
+                continue
+            subpath = preprints_dir / prefix_dir.name
+            first_img = subpath / f"{aid}-1.png"
+            if not first_img.is_file():
+                missing.append(aid)
+    return sorted(set(missing))
+
+
+def is_index_entry_minimal(item: dict) -> bool:
+    """判断 index 预印本条是否仅为 url/slug/title 三字段（需 API 补全）。"""
+    if not item or not isinstance(item, dict):
+        return True
+    keys = set(item.keys())
+    return keys <= {"url", "slug", "title"} and "slug" in item
+
+
+def collect_index_minimal_slugs(out_dir: Path) -> list[str]:
+    """从 backup/index.json 中找出仅含 url/slug/title 的预印本 slug 列表。"""
+    index_path = out_dir / "index.json"
+    if not index_path.is_file():
+        return []
+    try:
+        data = json.loads(index_path.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError):
+        return []
+    preprints = data.get("preprints") or []
+    return [p.get("slug") for p in preprints if p.get("slug") and is_index_entry_minimal(p)]
+
+
+def remove_legacy_images(subpath: Path, aid: str, keep_stems: set[str] | None = None) -> int:
+    """删除该预印本目录下旧版正文截图（{id}-*.png 等），返回删除数量。
+    若提供 keep_stems，则保留 stem 在该集合中的文件（用于先生成新图再删多余旧图，避免误删）。"""
     removed = 0
     for f in list(subpath.iterdir()):
         if not f.is_file():
             continue
         if f.suffix.lower() in (".png", ".jpg", ".jpeg", ".webp", ".gif"):
             if f.stem == aid or (f.stem.startswith(aid + "-") and f.stem[len(aid) :].lstrip("-").isdigit()):
+                if keep_stems is not None and f.stem in keep_stems:
+                    continue
                 try:
                     f.unlink()
                     removed += 1
@@ -563,10 +608,10 @@ def run_migrate_legacy(
                 prefix = aid[:2].lower()
                 pdf_path = OUTPUT_DIR / "pdfs" / prefix / f"{aid}.pdf"
                 subpath = OUTPUT_DIR / "preprints" / prefix
-                if delete_images and subpath.is_dir():
-                    remove_legacy_images(subpath, aid)
                 images = pdf_to_images(pdf_path, aid, subpath)
                 if images:
+                    if delete_images and subpath.is_dir():
+                        remove_legacy_images(subpath, aid, keep_stems={f"{aid}-{i}" for i in range(1, len(images) + 1)})
                     append_body_images_to_md(subpath / f"{aid}.md", images)
 
     typer.echo("迁移完成。索引未改动，仅更新了对应条目的 .meta.json、.md 与 PDF、正文图。")
@@ -620,10 +665,10 @@ def run_refresh_md(
                 prefix = aid[:2].lower()
                 pdf_path = OUTPUT_DIR / "pdfs" / prefix / f"{aid}.pdf"
                 subpath = OUTPUT_DIR / "preprints" / prefix
-                if delete_images and subpath.is_dir():
-                    remove_legacy_images(subpath, aid)
                 images = pdf_to_images(pdf_path, aid, subpath)
                 if images:
+                    if delete_images and subpath.is_dir():
+                        remove_legacy_images(subpath, aid, keep_stems={f"{aid}-{i}" for i in range(1, len(images) + 1)})
                     append_body_images_to_md(subpath / f"{aid}.md", images)
 
     typer.echo("刷新完成。已更新 .meta.json 与 .md（含丰富元信息），并处理 PDF、正文图。")
@@ -667,10 +712,10 @@ def run_update_md_from_local(
         if not pdf_path.is_file():
             continue
         subpath = OUTPUT_DIR / "preprints" / prefix
-        if delete_images_before and subpath.is_dir():
-            remove_legacy_images(subpath, aid)
         images = pdf_to_images(pdf_path, aid, subpath)
         if images:
+            if delete_images_before and subpath.is_dir():
+                remove_legacy_images(subpath, aid, keep_stems={f"{aid}-{i}" for i in range(1, len(images) + 1)})
             append_body_images_to_md(subpath / f"{aid}.md", images)
 
     typer.echo("本地更新完成。已根据 .meta.json 与 PDF 重写 .md 并生成正文图。")
@@ -710,10 +755,10 @@ def run_retry_pdf(
         prefix = aid[:2].lower()
         pdf_path = OUTPUT_DIR / "pdfs" / prefix / f"{aid}.pdf"
         subpath = OUTPUT_DIR / "preprints" / prefix
-        if subpath.is_dir():
-            remove_legacy_images(subpath, aid)
         images = pdf_to_images(pdf_path, aid, subpath)
         if images:
+            if subpath.is_dir():
+                remove_legacy_images(subpath, aid, keep_stems={f"{aid}-{i}" for i in range(1, len(images) + 1)})
             append_body_images_to_md(subpath / f"{aid}.md", images)
     typer.echo("重试完成。")
 
@@ -732,6 +777,141 @@ def run_status(output_dir: Path | None = None) -> None:
     typer.echo(f"官网共 {len(all_ids)} 篇，本地已收录 {len(existing_ids)} 篇，落后 {len(to_fetch)} 篇（待同步）。")
     if to_fetch:
         typer.echo("待同步 id 示例: " + ", ".join(to_fetch[:5]) + (" …" if len(to_fetch) > 5 else ""))
+
+
+def run_check(output_dir: Path | None = None) -> None:
+    """检查：有 PDF 无正文图、缺失的 PDF、index 仅三字段待补全；不访问 API。"""
+    global OUTPUT_DIR
+    OUTPUT_DIR = Path(output_dir or OUTPUT_DIR)
+    if not OUTPUT_DIR.is_dir():
+        typer.echo(f"目录不存在: {OUTPUT_DIR}", err=True)
+        raise SystemExit(1)
+
+    has_pdf_no_images = collect_ids_has_pdf_no_images(OUTPUT_DIR)
+    missing_pdf = collect_ids_missing_pdf(OUTPUT_DIR)
+    index_minimal = collect_index_minimal_slugs(OUTPUT_DIR)
+
+    typer.echo("【有 PDF 但未生成正文图】")
+    typer.echo(f"  共 {len(has_pdf_no_images)} 篇。建议执行: update-md-local 或 refresh-md")
+    if has_pdf_no_images:
+        typer.echo("  id: " + ", ".join(has_pdf_no_images[:15]) + (" …" if len(has_pdf_no_images) > 15 else ""))
+
+    typer.echo("【缺失的 PDF】元数据有 pdf_url 但本地无文件（相对网站未下载）")
+    typer.echo(f"  共 {len(missing_pdf)} 篇。建议执行: retry-pdf")
+    if missing_pdf:
+        typer.echo("  id: " + ", ".join(missing_pdf[:15]) + (" …" if len(missing_pdf) > 15 else ""))
+
+    typer.echo("【index.json 仅 url/slug/title 三字段待补全】")
+    typer.echo(f"  共 {len(index_minimal)} 篇。建议执行: fill-index")
+    if index_minimal:
+        typer.echo("  slug: " + ", ".join(index_minimal[:15]) + (" …" if len(index_minimal) > 15 else ""))
+
+    typer.echo("（若要看相对网站落后篇数/待同步列表，请执行: sync status）")
+
+
+def _build_index_entry_from_article(aid: str, article: dict) -> dict:
+    """从 API article 或 .meta.json 中的 article 构建 index 条目。"""
+    return {
+        "url": f"https://shitjournal.org/preprints/{aid}",
+        "slug": aid,
+        "title": article.get("title") or aid,
+        "pdf_url": article.get("pdf_url"),
+        "created_at": article.get("created_at"),
+        "author": article.get("author"),
+    }
+
+
+def _get_local_article_for_fill(out_dir: Path, aid: str) -> dict | None:
+    """若本地 .meta.json 已有完整 article（含 created_at 或 pdf_url），返回 article 用于只更新 index；否则返回 None 表示需请求 API。"""
+    prefix = aid[:2].lower()
+    meta_path = out_dir / "preprints" / prefix / f"{aid}.meta.json"
+    if not meta_path.is_file():
+        return None
+    try:
+        full = json.loads(meta_path.read_text(encoding="utf-8"))
+        article = full.get("article") if isinstance(full, dict) else None
+        if not article or not isinstance(article, dict):
+            return None
+        if article.get("created_at") or article.get("pdf_url") is not None:
+            return article
+        return None
+    except (json.JSONDecodeError, OSError):
+        return None
+
+
+def run_fill_index(
+    output_dir: Path | None = None,
+    limit: int = 0,
+    delay: float = REFRESH_DELAY_SECONDS,
+) -> None:
+    """对 index 中仅含 url/slug/title 的条目补全并更新 index。已有完整 .meta.json 的只从本地构建条目不请求 API；否则请求 API 并写 .meta/.md/PDF/正文图。"""
+    global OUTPUT_DIR
+    OUTPUT_DIR = Path(output_dir or OUTPUT_DIR)
+    if not OUTPUT_DIR.is_dir():
+        typer.echo(f"目录不存在: {OUTPUT_DIR}", err=True)
+        raise SystemExit(1)
+
+    existing_ids, previous_index = load_existing_index(OUTPUT_DIR)
+    to_fill = collect_index_minimal_slugs(OUTPUT_DIR)
+    if limit > 0:
+        to_fill = to_fill[:limit]
+    if not to_fill:
+        typer.echo("没有仅三字段的 index 条目，无需补全。")
+        return
+
+    from_local = [aid for aid in to_fill if _get_local_article_for_fill(OUTPUT_DIR, aid)]
+    from_api = [aid for aid in to_fill if aid not in from_local]
+    typer.echo(f"待补全 {len(to_fill)} 篇：其中 {len(from_local)} 篇仅从本地 .meta.json 更新 index，{len(from_api)} 篇将请求 API 并更新 .meta/.md/PDF/正文图。")
+
+    filled: dict[str, dict] = {}
+    for aid in from_local:
+        article = _get_local_article_for_fill(OUTPUT_DIR, aid)
+        if article:
+            filled[aid] = _build_index_entry_from_article(aid, article)
+
+    for aid in tqdm(from_api, desc="fill-index (API)"):
+        time.sleep(delay)
+        try:
+            resp = fetch_article_detail(aid)
+        except (HTTPError, URLError, json.JSONDecodeError) as e:
+            typer.echo(f"详情请求失败 {aid}: {e}", err=True)
+            continue
+        if resp.get("status") != "success":
+            continue
+        article = resp.get("article")
+        if not article:
+            continue
+        save_preprint_article(
+            article,
+            OUTPUT_DIR,
+            comments=resp.get("comments", []),
+            fetched_at=time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+        )
+        pdf_url = article.get("pdf_url")
+        if pdf_url:
+            time.sleep(delay)
+            if download_pdf(pdf_url, aid, OUTPUT_DIR):
+                prefix = aid[:2].lower()
+                pdf_path = OUTPUT_DIR / "pdfs" / prefix / f"{aid}.pdf"
+                subpath = OUTPUT_DIR / "preprints" / prefix
+                images = pdf_to_images(pdf_path, aid, subpath)
+                if images:
+                    if subpath.is_dir():
+                        remove_legacy_images(subpath, aid, keep_stems={f"{aid}-{i}" for i in range(1, len(images) + 1)})
+                    append_body_images_to_md(subpath / f"{aid}.md", images)
+        filled[aid] = _build_index_entry_from_article(aid, article)
+
+    preprints = previous_index.get("preprints") or []
+    slug_to_filled = {item["slug"]: item for item in filled.values()}
+    new_preprints = [slug_to_filled.get(p.get("slug"), p) for p in preprints]
+    index = {
+        "news": previous_index.get("news", []),
+        "preprints": new_preprints,
+        "synced_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+    }
+    index_path = OUTPUT_DIR / "index.json"
+    index_path.write_text(json.dumps(index, ensure_ascii=False, indent=2), encoding="utf-8")
+    typer.echo(f"已补全 {len(filled)} 篇并更新 index: {index_path}（{len(from_local)} 篇仅更新 index，{len(from_api)} 篇 API+下载+正文图）")
 
 
 app = typer.Typer(help="S.H.I.T Journal 归档同步（API）")
@@ -819,6 +999,48 @@ def rebuild_index_cmd(
 ) -> None:
     """用本地 .meta.json 重建 index.json（保留原 news），不访问网站。"""
     run_rebuild_index(output_dir=output_dir)
+
+
+@app.command("check")
+def check_cmd(
+    output_dir: Path = typer.Option(OUTPUT_DIR, "--output", "-o", help="归档输出目录"),
+) -> None:
+    """检查：有 PDF 无正文图、缺失的 PDF、index 仅三字段待补全（不访问 API）。"""
+    run_check(output_dir=output_dir)
+
+
+@app.command("fill-index")
+def fill_index_cmd(
+    output_dir: Path = typer.Option(OUTPUT_DIR, "--output", "-o", help="归档输出目录"),
+    limit: int = typer.Option(0, "--limit", help="最多补全篇数，0 表示全部"),
+    delay: float = typer.Option(REFRESH_DELAY_SECONDS, "--delay", help="每次请求间隔秒数，默认 5"),
+) -> None:
+    """对 index 中仅 url/slug/title 的条目请求 API 补全元数据、.meta.json、.md、PDF、正文图并更新 index。"""
+    run_fill_index(output_dir=output_dir, limit=limit, delay=delay)
+
+
+def run_export_docs(output_dir: Path | None = None) -> None:
+    """将 backup/index.json 导出到 docs/data/index.json，供 Pages 本地加载。"""
+    global OUTPUT_DIR
+    OUTPUT_DIR = Path(output_dir or OUTPUT_DIR)
+    repo_root = OUTPUT_DIR.parent
+    index_src = OUTPUT_DIR / "index.json"
+    docs_data = repo_root / "docs" / "data"
+    index_dst = docs_data / "index.json"
+    if not index_src.is_file():
+        typer.echo(f"源文件不存在: {index_src}", err=True)
+        raise SystemExit(1)
+    docs_data.mkdir(parents=True, exist_ok=True)
+    index_dst.write_text(index_src.read_text(encoding="utf-8"), encoding="utf-8")
+    typer.echo(f"已导出: {index_src} -> {index_dst}")
+
+
+@app.command("export-docs")
+def export_docs_cmd(
+    output_dir: Path = typer.Option(OUTPUT_DIR, "--output", "-o", help="归档输出目录"),
+) -> None:
+    """将 backup/index.json 导出到 docs/data/index.json，供 Pages 使用。"""
+    run_export_docs(output_dir=output_dir)
 
 
 if __name__ == "__main__":

@@ -11,18 +11,16 @@
     "topic": "nan",
     "co_authors": [],
     "suggestions": "",
-    "rating_count": 180,
-    "avg_score": 4.838888888888889,
+    "rating_count": 194,
+    "avg_score": 4.850515463917525,
     "my_score": null,
     "created_at": "2026-03-04T00:39:13.752381Z",
     "author": {
       "id": "bc54f527-8a32-431f-8324-72660cb70829",
       "display_name": "拖拖",
-      "avatar_url": null,
-      "institution": "UWC DOVER",
-      "social_media": "抖音：thomas_luk"
+      "avatar_url": null
     }
   },
   "comments": [],
-  "fetched_at": "2026-03-08T09:12:23Z"
+  "fetched_at": "2026-03-10T16:02:10Z"
 }
