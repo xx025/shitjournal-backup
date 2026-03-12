@@ -170,6 +170,30 @@
       errorEl.textContent = msg;
     }
 
+    function cdnUrlToRawUrl(cdnUrl) {
+      if (!cdnUrl || cdnUrl.indexOf(RAW_CDN) !== 0) return '';
+      var rest = cdnUrl.slice(RAW_CDN.length).replace(/^\/+/, '');
+      var parts = rest.split('/');
+      if (parts.length < 7) return '';
+      var branch = parts[5];
+      var filePath = parts.slice(6).join('/');
+      return RAW_GITHUB + '/' + OWNER + '/' + REPO_NAME + '/' + branch + '/' + filePath;
+    }
+
+    function attachImageFallback(container) {
+      if (!container) return;
+      var imgs = container.querySelectorAll('img[src]');
+      imgs.forEach(function (img) {
+        var fallback = cdnUrlToRawUrl(img.src);
+        if (!fallback) return;
+        img.loading = 'lazy';
+        img.addEventListener('error', function once() {
+          img.removeEventListener('error', once);
+          img.src = fallback;
+        });
+      });
+    }
+
     function renderMd(raw) {
       var pdfUrl = extractPdfUrl(raw);
       var md = rewriteRelativeUrls(raw, slug);
@@ -180,6 +204,7 @@
       } else {
         articleEl.textContent = md;
       }
+      attachImageFallback(articleEl);
       insertLinksBar(articleEl, slug, pdfUrl);
       articleEl.style.display = 'block';
       document.title = (articleEl.querySelector('h1') && articleEl.querySelector('h1').textContent) || slug + ' — 预览';
