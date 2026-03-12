@@ -2825,7 +2825,43 @@
         "display_name": "莲湖区拉屎大王",
         "avatar_url": null
       }
+    },
+    {
+      "url": "https://shitjournal.org/preprints/51cbf247-d3fa-433e-b8b0-126fef8d1903",
+      "slug": "51cbf247-d3fa-433e-b8b0-126fef8d1903",
+      "title": "信息熵视角下抖音及小红书平台的内容分布与演化特征——以“我的刀盾”为例",
+      "pdf_url": "https://files.shitjournal.org/51cbf247-d3fa-433e-b8b0-126fef8d1903.pdf",
+      "created_at": "2026-03-03T13:59:28.065747Z",
+      "author": {
+        "id": "286e59ab-0f69-444a-aa86-36525f4f37b4",
+        "display_name": "思路零",
+        "avatar_url": null
+      }
+    },
+    {
+      "url": "https://shitjournal.org/preprints/8d8c5051-b0dd-4c56-8e74-7cc921a72fbd",
+      "slug": "8d8c5051-b0dd-4c56-8e74-7cc921a72fbd",
+      "title": "如厕忘记带纸的尴尬处境对后续生活影响：一项基于个案的研究",
+      "pdf_url": "https://files.shitjournal.org/8d8c5051-b0dd-4c56-8e74-7cc921a72fbd.pdf",
+      "created_at": "2026-03-03T14:10:41.512832Z",
+      "author": {
+        "id": "0298742b-01e9-4bbd-a52a-b1bbfc34693f",
+        "display_name": "每天都要拉翔",
+        "avatar_url": null
+      }
+    },
+    {
+      "url": "https://shitjournal.org/preprints/ad1570af-5513-43fa-aafc-119b2287ac13",
+      "slug": "ad1570af-5513-43fa-aafc-119b2287ac13",
+      "title": "观测即归零：从薛定谔的猫到黄金体验镇魂曲——拼多多砍一刀如何让量子力学与替身能力在最后一刀上达成共识",
+      "pdf_url": "https://files.shitjournal.org/ad1570af-5513-43fa-aafc-119b2287ac13.pdf",
+      "created_at": "2026-03-03T14:03:12.651207Z",
+      "author": {
+        "id": "2474bddb-aa6f-4280-b02c-69dece4884ff",
+        "display_name": "sweet",
+        "avatar_url": null
+      }
     }
   ],
-  "synced_at": "2026-03-11T17:22:10Z"
+  "synced_at": "2026-03-12T10:02:40Z"
 }
