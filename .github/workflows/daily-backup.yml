@@ -40,11 +40,14 @@ jobs:
       - name: Sync and archive
         run: python .github/scripts/sync.py run --preprints-limit 100 --push-every 25
 
+      - name: Export index for docs
+        run: python .github/scripts/sync.py export-docs
+
       - name: Commit and push archive
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add backup/
+          git add backup/ docs/data/index.json
           git diff --staged --quiet && exit 0
           git commit -m "chore(archive): sync shitjournal [automated]"
           git pull --rebase origin main

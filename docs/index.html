@@ -216,13 +216,22 @@ function preprintPath(slug) {
         return decodeURIComponent(escape(binary));
       }
     }
-function applyIndex(index) {
+    function applyIndex(index) {
       if (!index || typeof index !== "object") {
         onIndexError(new Error('索引格式无效'));
         return;
       }
       var preprintsRaw = index.preprints || [];
-      window.__preprintItems__ = Array.isArray(preprintsRaw) ? preprintsRaw.slice().reverse() : [];
+      var items = Array.isArray(preprintsRaw) ? preprintsRaw.slice() : [];
+      items.sort(function (a, b) {
+        var ta = Date.parse(a && a.created_at ? a.created_at : '') || 0;
+        var tb = Date.parse(b && b.created_at ? b.created_at : '') || 0;
+        if (ta !== tb) return tb - ta; // 新的在前
+        var sa = (a && a.slug) || '';
+        var sb = (b && b.slug) || '';
+        return sb.localeCompare(sa);
+      });
+      window.__preprintItems__ = items;
       window.__preprintSearch__ = '';
       renderPreprints(window.__preprintItems__, 1);
       var searchEl = document.getElementById('preprints-search');
