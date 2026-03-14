@@ -53,5 +53,10 @@ jobs:
           git lfs status
           git commit -m "chore(archive): sync shitjournal [automated]"
           git fetch origin main
-          git merge origin/main -m "chore(archive): merge origin/main [automated]"
+          git merge origin/main -m "chore(archive): merge origin/main [automated]" || true
+          if git status | grep -q "Unmerged paths"; then
+            git checkout --ours backup/index.json docs/data/index.json
+            git add backup/index.json docs/data/index.json
+            git commit --no-edit
+          fi
           git push origin main
