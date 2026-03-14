@@ -43,6 +43,13 @@ jobs:
       - name: Export index for docs
         run: python .github/scripts/sync.py export-docs
 
+      - name: Check Hugging Face token
+        run: |
+          if [ -z "${{ secrets.HF_TOKEN }}" ]; then
+            echo "::error::未配置 HF_TOKEN。请在仓库 Settings → Secrets and variables → Actions 中添加 HF_TOKEN（从 https://huggingface.co/settings/tokens 创建，需 write 权限）。"
+            exit 1
+          fi
+
       - name: Upload PDF and images to Hugging Face
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}

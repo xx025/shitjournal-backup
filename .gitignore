@@ -21,3 +21,4 @@ playwright/.cache/
 backup/pdfs/
 backup/preprints/**/*.png
 backup/news/**/*.png
+backup/.cache/
