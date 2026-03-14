@@ -24,7 +24,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          lfs: true
+          lfs: false
 
       - name: Install Git LFS and poppler (pdftoppm)
         run: sudo apt-get update && sudo apt-get install -y git-lfs poppler-utils && git lfs install
