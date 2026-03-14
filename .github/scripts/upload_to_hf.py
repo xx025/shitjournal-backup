@@ -18,6 +18,7 @@ def upload_to_hf(
     backup_dir: Path = BACKUP_DIR,
     repo_id: str = HF_REPO_ID,
     token: str | None = None,
+    num_workers: int = 2,
 ) -> None:
     try:
         from huggingface_hub import HfApi
@@ -37,11 +38,13 @@ def upload_to_hf(
         raise SystemExit(1)
 
     api = HfApi(token=token)
-    typer.echo("使用 upload_large_folder 上传 backup/（含 pdfs/、preprints/），支持断点续传与大体积。")
+    typer.echo("使用 upload_large_folder 上传 backup/（含 pdfs/、preprints/），忽略本地缓存并降低并发以减少 HF API 限流。")
     api.upload_large_folder(
         folder_path=str(backup_dir),
         repo_id=repo_id,
         repo_type="dataset",
+        ignore_patterns=[".cache", ".cache/**"],
+        num_workers=max(1, num_workers),
     )
     typer.echo("Hugging Face 上传完成。")
 
@@ -50,8 +53,14 @@ def main(
     backup_dir: Path = typer.Option(BACKUP_DIR, "--output", "-o", help="backup 目录"),
     repo_id: str = typer.Option(HF_REPO_ID, "--repo", "-r", help="HF 数据集 repo_id"),
     token: str = typer.Option("", "--token", envvar="HF_TOKEN", help="HF token，或环境变量 HF_TOKEN"),
+    num_workers: int = typer.Option(2, "--num-workers", help="上传 worker 数，默认 2；遇到 HF 429 可进一步调小到 1"),
 ) -> None:
-    upload_to_hf(backup_dir=backup_dir, repo_id=repo_id, token=token or None)
+    upload_to_hf(
+        backup_dir=backup_dir,
+        repo_id=repo_id,
+        token=token or None,
+        num_workers=num_workers,
+    )
 
 
 if __name__ == "__main__":
