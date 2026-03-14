@@ -20,3 +20,4 @@ playwright/.cache/
 # 大文件仅存 Hugging Face，Git 不跟踪
 backup/pdfs/
 backup/preprints/**/*.png
+backup/news/**/*.png
