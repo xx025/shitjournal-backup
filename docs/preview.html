@@ -43,6 +43,7 @@
     var BRANCH = 'main';
     var RAW_CDN = 'https://xget.xi-xu.me/gh';
     var RAW_GITHUB = 'https://raw.githubusercontent.com';
+    var HF_BASE = 'https://huggingface.co/datasets/jsonhash/shitjournal-backup/resolve/main/';
     var parts = REPO.split('/');
     var OWNER = parts[0] || 'xx025';
     var REPO_NAME = parts[1] || 'shitjournal-backup';
@@ -102,9 +103,15 @@
     }
 
     function rawBase(slug) {
-      if (!slug || slug.length < 2) return getRawUrl(BRANCH, 'backup/preprints/xx');
+      if (!slug || slug.length < 2) return HF_BASE + 'preprints/xx';
       var prefix = slug.slice(0, 2).toLowerCase();
-      return getRawUrl(BRANCH, 'backup/preprints/' + prefix);
+      return HF_BASE + 'preprints/' + prefix;
+    }
+
+    function hfPdfUrl(slug) {
+      if (!slug || slug.length < 2) return '';
+      var prefix = slug.slice(0, 2).toLowerCase();
+      return HF_BASE + 'pdfs/' + prefix + '/' + slug + '.pdf';
     }
 
     function base64ToUtf8(base64) {
@@ -154,12 +161,13 @@
       var prefix = slug.length >= 2 ? slug.slice(0, 2).toLowerCase() : 'xx';
       var originUrl = 'https://shitjournal.org/preprints/' + slug;
       var metaUrl = getRawUrl(BRANCH, 'backup/preprints/' + prefix + '/' + slug + '.meta.json');
+      var finalPdfUrl = hfPdfUrl(slug) || pdfUrl;
       var h1 = articleEl.querySelector('h1');
       if (!h1) return;
       var div = document.createElement('div');
       div.className = 'preview-links';
       div.innerHTML = '<a href="' + originUrl + '" target="_blank" rel="noopener">[原文链接]</a>' +
-        (pdfUrl ? '<a href="' + pdfUrl + '" target="_blank" rel="noopener">[PDF下载]</a>' : '') +
+        (finalPdfUrl ? '<a href="' + finalPdfUrl + '" target="_blank" rel="noopener">[PDF下载]</a>' : '') +
         ' <a href="' + metaUrl + '" target="_blank" rel="noopener">[元信息]</a>';
       h1.parentNode.insertBefore(div, h1.nextSibling);
     }

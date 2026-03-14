@@ -54,6 +54,7 @@
     var BRANCH = 'main';
     var PAGE_SIZE = 15;
     var RAW_CDN = 'https://xget.xi-xu.me/gh';
+    var HF_BASE = 'https://huggingface.co/datasets/jsonhash/shitjournal-backup/resolve/main/';
     var parts = REPO.split('/');
     var OWNER = parts[0] || 'xx025';
     var REPO_NAME = parts[1] || 'shitjournal-backup';
@@ -86,8 +87,7 @@ function preprintPath(slug) {
     function pdfCdnUrl(slug) {
       if (!slug || slug.length < 2) return '';
       var prefix = slug.slice(0, 2).toLowerCase();
-      var filePath = 'backup/pdfs/' + prefix + '/' + slug + '.pdf';
-      return RAW_CDN + '/' + OWNER + '/' + REPO_NAME + '/raw/refs/heads/' + BRANCH + '/' + filePath;
+      return HF_BASE + 'pdfs/' + prefix + '/' + slug + '.pdf';
     }
 
     function slicePage(items, page) {
@@ -221,6 +221,7 @@ function preprintPath(slug) {
         onIndexError(new Error('索引格式无效'));
         return;
       }
+      if (index.hf_base) HF_BASE = String(index.hf_base);
       var preprintsRaw = index.preprints || [];
       var items = Array.isArray(preprintsRaw) ? preprintsRaw.slice() : [];
       items.sort(function (a, b) {
