@@ -43,14 +43,17 @@ jobs:
       - name: Export index for docs
         run: python .github/scripts/sync.py export-docs
 
+      - name: Upload PDF and images to Hugging Face
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: python .github/scripts/upload_to_hf.py --token "$HF_TOKEN"
+
       - name: Commit and push archive
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git lfs install --local
           git add backup/ docs/data/index.json
           git diff --staged --quiet && exit 0
-          git lfs status
           git commit -m "chore(archive): sync shitjournal [automated]"
           git fetch origin main
           git merge origin/main -m "chore(archive): merge origin/main [automated]" || true

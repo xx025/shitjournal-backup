@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 """
 S.H.I.T Journal 同步脚本 — 通过官网 API 同步预印本元数据并归档。
-下载 PDF 至 backup/pdfs/{prefix}/{id}.pdf（由 Git LFS 托管，控制仓库体积）；新闻暂无 API，保留既有索引。
+PDF 与正文图上传至 Hugging Face 数据集（jsonhash/shitjournal-backup），Git 仅保留 index、.meta.json、.md。
+新闻暂无 API，保留既有索引。
 """
 from __future__ import annotations
 
 import json
+import shutil
 import subprocess
 import time
 from pathlib import Path
@@ -217,6 +219,29 @@ def append_body_images_to_md(md_path: Path, image_filenames: list[str]) -> None:
         lines.append(f"![第{i}页]({name})")
         lines.append("")
     md_path.write_text(content + "\n".join(lines), encoding="utf-8")
+
+
+def move_preprints_into_prefix_dirs(out_dir: Path) -> tuple[int, int]:
+    """将 backup/preprints 下直接存放的文件按 id 前两位移入 preprints/{prefix}/。返回 (移动数, 跳过数)。"""
+    preprints_dir = out_dir / "preprints"
+    if not preprints_dir.is_dir():
+        return 0, 0
+    moved, skipped = 0, 0
+    top_level = [p for p in preprints_dir.iterdir() if p.is_file()]
+    for path in tqdm(top_level, desc="移入两位字母目录"):
+        prefix = path.name[:2].lower()
+        if len(prefix) != 2:
+            skipped += 1
+            continue
+        subpath = preprints_dir / prefix
+        subpath.mkdir(parents=True, exist_ok=True)
+        dest = subpath / path.name
+        if dest.resolve() == path.resolve():
+            skipped += 1
+            continue
+        shutil.move(str(path), str(dest))
+        moved += 1
+    return moved, skipped
 
 
 def collect_preprints_from_local_meta(out_dir: Path) -> list[dict]:
@@ -993,6 +1018,14 @@ def retry_pdf_cmd(
     run_retry_pdf(output_dir=output_dir, limit=limit, delay=delay)
 
 
+@app.command("move-preprints-into-prefix-dirs")
+def move_preprints_into_prefix_dirs_cmd(
+    output_dir: Path = typer.Option(OUTPUT_DIR, "--output", "-o", help="归档输出目录"),
+) -> None:
+    """将 backup/preprints 下直接存放的文件按 id 前两位移入 preprints/{prefix}/。"""
+    moved, skipped = move_preprints_into_prefix_dirs(output_dir)
+    typer.echo(f"已移动 {moved} 个文件，跳过 {skipped} 个。")
+
 @app.command("rebuild-index")
 def rebuild_index_cmd(
     output_dir: Path = typer.Option(OUTPUT_DIR, "--output", "-o", help="归档输出目录"),
@@ -1019,8 +1052,11 @@ def fill_index_cmd(
     run_fill_index(output_dir=output_dir, limit=limit, delay=delay)
 
 
+HF_DATASET_BASE = "https://huggingface.co/datasets/jsonhash/shitjournal-backup/resolve/main"
+
+
 def run_export_docs(output_dir: Path | None = None) -> None:
-    """将 backup/index.json 导出到 docs/data/index.json，供 Pages 本地加载。"""
+    """将 backup/index.json 导出到 docs/data/index.json，供 Pages 本地加载；为每条预印本添加 hf_pdf_url。"""
     global OUTPUT_DIR
     OUTPUT_DIR = Path(output_dir or OUTPUT_DIR)
     repo_root = OUTPUT_DIR.parent
@@ -1031,7 +1067,13 @@ def run_export_docs(output_dir: Path | None = None) -> None:
         typer.echo(f"源文件不存在: {index_src}", err=True)
         raise SystemExit(1)
     docs_data.mkdir(parents=True, exist_ok=True)
-    index_dst.write_text(index_src.read_text(encoding="utf-8"), encoding="utf-8")
+    data = json.loads(index_src.read_text(encoding="utf-8"))
+    data["hf_base"] = HF_DATASET_BASE.rstrip("/") + "/"
+    for item in data.get("preprints") or []:
+        slug = item.get("slug") or ""
+        prefix = slug[:2].lower() if len(slug) >= 2 else "xx"
+        item["hf_pdf_url"] = f"{data['hf_base']}pdfs/{prefix}/{slug}.pdf"
+    index_dst.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
     typer.echo(f"已导出: {index_src} -> {index_dst}")
 
 

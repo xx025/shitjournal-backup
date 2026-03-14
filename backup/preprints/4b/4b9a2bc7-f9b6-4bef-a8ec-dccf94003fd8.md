@@ -1,33 +1,34 @@
 # 重口味抽象的社交突围：抖音大粪视频分享的社会行为学解构
 
-## 元信息
+- **URL**: https://shitjournal.org/preprints/4b9a2bc7-f9b6-4bef-a8ec-dccf94003fd8
+- **author**: 莲湖区拉屎大王
+- **institution**: West Coast Institute of Technology
+- **discipline**: 文 / Humanities
+- **submitted**: 2026/3/3 22:26:54
+- **viscosity**: Stringy / 拉丝型
 
-- **作者**: 莲湖区拉屎大王
-- **机构**: 
-- **分区**: septic
-- **学科**: humanities
-- **标签**: meme
-- **提交时间**: 2026-03-03T14:26:54.938164Z
-- **评分**: 4.33 / 5（43 人）
+---
 
-## 链接
+## 重口味抽象的社交突围：抖音大粪视频分享的社会行为学解构
 
-- [网站原始文章](https://shitjournal.org/preprints/4b9a2bc7-f9b6-4bef-a8ec-dccf94003fd8)
-- [PDF](https://files.shitjournal.org/4b9a2bc7-f9b6-4bef-a8ec-dccf94003fd8.pdf)
-- [文章元信息](4b9a2bc7-f9b6-4bef-a8ec-dccf94003fd8.meta.json)
+莲湖区拉屎大王
 
-## 正文
+West Coast Institute of Technology
 
-![第1页](4b9a2bc7-f9b6-4bef-a8ec-dccf94003fd8-1.png)
+Stringy / 拉丝型
 
-![第2页](4b9a2bc7-f9b6-4bef-a8ec-dccf94003fd8-2.png)
+文 / Humanities
 
-![第3页](4b9a2bc7-f9b6-4bef-a8ec-dccf94003fd8-3.png)
+2026/3/3 22:26:54
 
-![第4页](4b9a2bc7-f9b6-4bef-a8ec-dccf94003fd8-4.png)
+先做个银梦 · 下北泽第一研究院共一
 
-![第5页](4b9a2bc7-f9b6-4bef-a8ec-dccf94003fd8-5.png)
+### Rate / 评价
 
-![第6页](4b9a2bc7-f9b6-4bef-a8ec-dccf94003fd8-6.png)
+[Sign In / 登录](/login)
 
-![第7页](4b9a2bc7-f9b6-4bef-a8ec-dccf94003fd8-7.png)
+### Manuscript / 全文
+
+本内容纯属整活，不代表任何学术观点或现实指导建议。请保持理智，切勿模仿。
+
+暂无评论 / No comments yet

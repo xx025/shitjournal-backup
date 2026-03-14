@@ -1,3 +1,1 @@
-# PDF 与预印本正文截图由 Git LFS 托管，避免仓库体积过大
-backup/pdfs/** filter=lfs diff=lfs merge=lfs -text
-backup/preprints/**/*.png filter=lfs diff=lfs merge=lfs -text
+# PDF 与正文图已迁至 Hugging Face 数据集，Git 不再跟踪（见 .gitignore）
