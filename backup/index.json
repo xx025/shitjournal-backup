@@ -2861,7 +2861,55 @@
         "display_name": "sweet",
         "avatar_url": null
       }
+    },
+    {
+      "url": "https://shitjournal.org/preprints/73169cf1-2a92-41c0-a397-d98f3db11f32",
+      "slug": "73169cf1-2a92-41c0-a397-d98f3db11f32",
+      "title": "论移动场景下听觉沉浸的劲爽阈值：坐车听歌与走路听歌的对比研究",
+      "pdf_url": "https://files.shitjournal.org/73169cf1-2a92-41c0-a397-d98f3db11f32.pdf",
+      "created_at": "2026-03-03T13:36:55.325111Z",
+      "author": {
+        "id": "7da8355a-7a35-4993-8a9c-2404f86dcbde",
+        "display_name": "ggboy",
+        "avatar_url": null
+      }
+    },
+    {
+      "url": "https://shitjournal.org/preprints/3d2ec8a7-f56f-40c6-a699-f0d3ba3173d5",
+      "slug": "3d2ec8a7-f56f-40c6-a699-f0d3ba3173d5",
+      "title": "SHITNet：一种面向生物源性非规则堆积形态的结构感知视觉框架",
+      "pdf_url": "https://files.shitjournal.org/3d2ec8a7-f56f-40c6-a699-f0d3ba3173d5.pdf",
+      "created_at": "2026-03-03T13:32:13.418776Z",
+      "author": {
+        "id": "15239817-d459-440a-9675-9e94f719c1e5",
+        "display_name": "Sky_Shit",
+        "avatar_url": null
+      }
+    },
+    {
+      "url": "https://shitjournal.org/preprints/f2d04925-2427-44c7-8297-9a880b4d821d",
+      "slug": "f2d04925-2427-44c7-8297-9a880b4d821d",
+      "title": "听一万遍《反方向的钟》能否回到假期第一天？——基于万次逆序声波干预的糟粕实证",
+      "pdf_url": "https://files.shitjournal.org/f2d04925-2427-44c7-8297-9a880b4d821d.pdf",
+      "created_at": "2026-03-03T13:29:29.133668Z",
+      "author": {
+        "id": "4ef791dd-fb56-4de9-ad49-e340877bb485",
+        "display_name": "某废物制造商",
+        "avatar_url": null
+      }
+    },
+    {
+      "url": "https://shitjournal.org/preprints/331f3405-d682-42e8-bb8f-3f85b5ceea68",
+      "slug": "331f3405-d682-42e8-bb8f-3f85b5ceea68",
+      "title": "恐龙与奥特曼战斗的跨尺度动力学分析：从生物力学到能量预算",
+      "pdf_url": "https://files.shitjournal.org/331f3405-d682-42e8-bb8f-3f85b5ceea68.pdf",
+      "created_at": "2026-03-03T13:35:43.223383Z",
+      "author": {
+        "id": "a4391d71-5b88-400f-95df-8e90aa25c534",
+        "display_name": "猪猪宝贝",
+        "avatar_url": null
+      }
     }
   ],
-  "synced_at": "2026-03-12T10:20:51Z"
+  "synced_at": "2026-03-14T11:58:00Z"
 }
