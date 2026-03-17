@@ -3130,8 +3130,21 @@
         "avatar_url": null
       },
       "hf_pdf_url": "https://huggingface.co/datasets/jsonhash/shitjournal-backup/resolve/main/pdfs/33/331f3405-d682-42e8-bb8f-3f85b5ceea68.pdf"
+    },
+    {
+      "url": "https://shitjournal.org/preprints/46bc7555-bccc-4cd7-bdb0-c1a203564523",
+      "slug": "46bc7555-bccc-4cd7-bdb0-c1a203564523",
+      "title": "解决问题的关键是解决关键问题 —— 基于废话文学理论深度论证",
+      "pdf_url": "https://files.shitjournal.org/46bc7555-bccc-4cd7-bdb0-c1a203564523.pdf",
+      "created_at": "2026-03-03T13:18:43.992393Z",
+      "author": {
+        "id": "6144e914-e1f1-45c0-97f4-573aba32860c",
+        "display_name": "Dr.SHIT·DSB·S",
+        "avatar_url": null
+      },
+      "hf_pdf_url": "https://huggingface.co/datasets/jsonhash/shitjournal-backup/resolve/main/pdfs/46/46bc7555-bccc-4cd7-bdb0-c1a203564523.pdf"
     }
   ],
-  "synced_at": "2026-03-16T17:25:59Z",
+  "synced_at": "2026-03-17T17:26:02Z",
   "hf_base": "https://huggingface.co/datasets/jsonhash/shitjournal-backup/resolve/main/"
 }

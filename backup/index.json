@@ -2909,7 +2909,19 @@
         "display_name": "猪猪宝贝",
         "avatar_url": null
       }
+    },
+    {
+      "url": "https://shitjournal.org/preprints/46bc7555-bccc-4cd7-bdb0-c1a203564523",
+      "slug": "46bc7555-bccc-4cd7-bdb0-c1a203564523",
+      "title": "解决问题的关键是解决关键问题 —— 基于废话文学理论深度论证",
+      "pdf_url": "https://files.shitjournal.org/46bc7555-bccc-4cd7-bdb0-c1a203564523.pdf",
+      "created_at": "2026-03-03T13:18:43.992393Z",
+      "author": {
+        "id": "6144e914-e1f1-45c0-97f4-573aba32860c",
+        "display_name": "Dr.SHIT·DSB·S",
+        "avatar_url": null
+      }
     }
   ],
-  "synced_at": "2026-03-16T17:25:59Z"
+  "synced_at": "2026-03-17T17:26:02Z"
 }
