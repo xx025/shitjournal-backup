@@ -3143,8 +3143,21 @@
         "avatar_url": null
       },
       "hf_pdf_url": "https://huggingface.co/datasets/jsonhash/shitjournal-backup/resolve/main/pdfs/46/46bc7555-bccc-4cd7-bdb0-c1a203564523.pdf"
+    },
+    {
+      "url": "https://shitjournal.org/preprints/c65a5af0-80e4-4587-8c95-2cf03831f901",
+      "slug": "c65a5af0-80e4-4587-8c95-2cf03831f901",
+      "title": "平台化社交中的两种亲密关系进入逻辑：日常协商型与标签筛选型比较研究 ——基于平台文本、关系脚本与风险收益模型的分析",
+      "pdf_url": "https://files.shitjournal.org/c65a5af0-80e4-4587-8c95-2cf03831f901.pdf",
+      "created_at": "2026-03-03T13:07:26.552787Z",
+      "author": {
+        "id": "92ea8179-4a8f-4441-a6b8-e3e265a0ae40",
+        "display_name": "我草莓招了",
+        "avatar_url": null
+      },
+      "hf_pdf_url": "https://huggingface.co/datasets/jsonhash/shitjournal-backup/resolve/main/pdfs/c6/c65a5af0-80e4-4587-8c95-2cf03831f901.pdf"
     }
   ],
-  "synced_at": "2026-03-21T17:08:30Z",
+  "synced_at": "2026-03-22T17:08:27Z",
   "hf_base": "https://huggingface.co/datasets/jsonhash/shitjournal-backup/resolve/main/"
 }
